@@ -93,3 +93,4 @@ The release pipeline automatically:
 2. Packages binaries (`dhabatui` + `dti`), `README.md`, and `LICENSE` into `.tar.gz` and `.zip` archives.
 3. Computes SHA256 checksums (`SHA256SUMS.txt`).
 4. Creates a new GitHub Release with attached download artifacts and auto-generated release notes.
+5. Publishes the crate automatically to [crates.io](https://crates.io/crates/dhabatui) when `CARGO_REGISTRY_TOKEN` is configured in repository secrets.

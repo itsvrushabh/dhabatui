@@ -56,11 +56,13 @@ Download the ready-to-run binary package for your operating system from **[GitHu
 *Every package contains both the full `dhabatui` binary and the fast `dti` alias.*
 
 ### Option 2: Install via Cargo
-If you have the Rust toolchain installed on your POS machine, install directly with Cargo:
+If you have the Rust toolchain installed, install directly from [crates.io](https://crates.io/crates/dhabatui):
 ```bash
+cargo install dhabatui
+# or install latest from git
 cargo install --git https://github.com/itsvrushabh/dhabatui.git
 ```
-*(Automatically places `dti` and `dhabatui` into your `~/.cargo/bin/`).*
+*(Automatically places both `dti` and `dhabatui` executables into your `~/.cargo/bin/`).*
 
 ---
 

@@ -4,6 +4,20 @@ version = "0.1.0"
 edition = "2021"
 authors = ["Dhaba POS Team"]
 description = "Fast, keyboard-first Terminal POS and billing application for dhabas and casual eateries"
+license = "MIT"
+repository = "https://github.com/itsvrushabh/dhabatui"
+homepage = "https://github.com/itsvrushabh/dhabatui"
+documentation = "https://docs.rs/dhabatui"
+readme = "README.md"
+keywords = ["tui", "pos", "billing", "ratatui", "dhaba"]
+categories = ["command-line-utilities"]
+exclude = [
+    "receipt.txt",
+    "receipts/*",
+    "dhabatui.log*",
+    "dhabatui.redb*",
+    ".github/*"
+]
 
 [dependencies]
 ratatui = "0.29"
@@ -20,4 +34,3 @@ tiny_http = "0.12"
 
 [dev-dependencies]
 tempfile = "3"
-
