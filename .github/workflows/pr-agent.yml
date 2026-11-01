@@ -45,4 +45,4 @@ jobs:
           CONFIG.CUSTOM_MODEL_MAX_TOKENS: "32000"
           github_action_config.auto_describe: "true"
           github_action_config.auto_review: "true"
-          github_action_config.auto_improve: "true"
+          github_action_config.auto_improve: "false"
