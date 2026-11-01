@@ -116,6 +116,7 @@ All detailed operating guides, architecture designs, and reference documentation
 - 🏗️ **[System Architecture](docs/ARCHITECTURE.md)**: Embedded `redb` storage engine, multi-table domain, and thread architecture.
 - 💰 **[Financials & GST Math](docs/FINANCIALS.md)**: Integer paise representation and exact half-up rounding for 2.5% CGST + 2.5% SGST.
 - 🛠️ **[Developer & Testing Guide](docs/DEVELOPMENT.md)**: Building, test suite, and CI/CD pipelines.
+- 🤖 **[PR-Agent Automated Reviews](docs/PR_AGENT_GUIDE.md)**: AI-driven automated pull request analysis and review workflow.
 
 ---
 

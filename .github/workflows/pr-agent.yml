@@ -20,23 +20,25 @@ jobs:
       - name: Check for AI API Key
         id: check_keys
         run: |
-          if [ -n "${{ secrets.OPENAI_KEY }}" ] || [ -n "${{ secrets.GEMINI_API_KEY }}" ] || [ -n "${{ secrets.GEMINI_KEY }}" ]; then
+          if [ -n "${{ secrets.OPENAI_KEY }}" ] || [ -n "${{ secrets.OPENAI_API_KEY }}" ] || [ -n "${{ secrets.GEMINI_API_KEY }}" ] || [ -n "${{ secrets.GEMINI_KEY }}" ] || [ -n "${{ secrets.ANTHROPIC_KEY }}" ] || [ -n "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
             echo "has_key=true" >> "$GITHUB_OUTPUT"
           else
             echo "has_key=false" >> "$GITHUB_OUTPUT"
-            echo "::notice ::No OPENAI_KEY or GEMINI_API_KEY secret configured in repository settings. Set OPENAI_KEY or GEMINI_API_KEY in repo Settings > Secrets and variables > Actions to enable automated PR-Agent reviews."
+            echo "::notice ::No AI API key secret configured in repository settings. Set OPENAI_KEY, OPENAI_API_KEY, GEMINI_API_KEY, or ANTHROPIC_KEY in repo Settings > Secrets and variables > Actions to enable automated PR-Agent reviews."
           fi
 
       - name: PR Agent action step
         if: steps.check_keys.outputs.has_key == 'true'
         id: pragent
         continue-on-error: true
-        uses: the-pr-agent/pr-agent@main
+        uses: Codium-ai/pr-agent@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+          OPENAI_KEY: ${{ secrets.OPENAI_KEY || secrets.OPENAI_API_KEY }}
+          OPENAI.API_KEY: ${{ secrets.OPENAI_KEY || secrets.OPENAI_API_KEY }}
           GEMINI_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GEMINI_KEY }}
           GOOGLE_AI_STUDIO.GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GEMINI_KEY }}
+          ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_KEY || secrets.ANTHROPIC_API_KEY }}
           github_action_config.auto_describe: "true"
           github_action_config.auto_review: "true"
           github_action_config.auto_improve: "true"

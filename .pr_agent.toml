@@ -21,7 +21,7 @@ ask_and_reflect = true
 require_score_review = true
 require_tests_review = true
 extra_instructions = """
-Focus on Rust idioms, concurrency safety, terminal UI resilience, network security (LAN validation), and Redb transactional safety.
+Enforce the zero-floating point constraint: all prices, subtotals, GST taxes, and totals must strictly use integer paise (u32/u64). Never introduce f32/f64. Focus on Rust idioms, concurrency safety, terminal UI resilience, network security (LAN validation), and Redb transactional safety.
 """
 
 [pr_describe]
@@ -30,7 +30,7 @@ add_original_user_description = true
 
 [pr_code_suggestions]
 num_code_suggestions = 4
-extra_instructions = "Prefer idiomatic Rust and zero-cost abstractions."
+extra_instructions = "Prefer idiomatic Rust, zero-cost abstractions, and strict integer paise currency arithmetic."
 
 [pr_questions]
 use_conversation_history = true
