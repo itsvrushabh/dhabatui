@@ -102,7 +102,7 @@ dhabatui
 | **`+`** / **`-`** | Increment or decrement item quantity |
 | **`m`** | **Making Charges (*Banwai*)**: Add custom meat preparation |
 | **`e`** | **Alter Price**: Override unit price for active dish |
-| **`p`** | **Settle Bill**: Commit to `redb`, generate receipt, and clear table |
+| **`p`** | **Settle Bill**: Choose payment mode (`[1] Cash`, `[2] UPI`, `[3] Khaata`), commit to `redb`, print receipt |
 | **`q`** / **`Esc`** | Exit DhabaTUI or close popup modal |
 
 ---
