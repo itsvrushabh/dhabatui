@@ -1,0 +1,39 @@
+name: Request Copilot Review
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+  issue_comment:
+    types: [created]
+
+jobs:
+  request-copilot-review:
+    name: Request Copilot Review
+    if: >-
+      (github.event_name == 'pull_request' && !github.event.pull_request.draft) ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/copilot'))
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Determine PR Number
+        id: pr_info
+        run: |
+          if [ "${{ github.event_name }}" = "issue_comment" ]; then
+            echo "pr_number=${{ github.event.issue.number }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "pr_number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Request Copilot Code Review
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.pr_info.outputs.pr_number }}
+        run: |
+          echo "Requesting Copilot code review for PR #${PR_NUMBER}..."
+          if gh pr edit "${PR_NUMBER}" --add-reviewer "@copilot"; then
+            echo "Successfully requested Copilot code review for PR #${PR_NUMBER}."
+          else
+            echo "::notice ::Could not automatically assign @copilot. Ensure GitHub Copilot Code Review is enabled in repository settings."
+          fi
