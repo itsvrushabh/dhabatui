@@ -17,6 +17,9 @@ jobs:
       pull-requests: write
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Determine PR Number
         id: pr_info
         run: |
@@ -29,10 +32,11 @@ jobs:
       - name: Request Copilot Code Review
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ steps.pr_info.outputs.pr_number }}
         run: |
-          echo "Requesting Copilot code review for PR #${PR_NUMBER}..."
-          if gh pr edit "${PR_NUMBER}" --add-reviewer "@copilot"; then
+          echo "Requesting Copilot code review for PR #${PR_NUMBER} in ${GH_REPO}..."
+          if gh pr edit "${PR_NUMBER}" --add-reviewer "@copilot" --repo "${GH_REPO}"; then
             echo "Successfully requested Copilot code review for PR #${PR_NUMBER}."
           else
             echo "::notice ::Could not automatically assign @copilot. Ensure GitHub Copilot Code Review is enabled in repository settings."
