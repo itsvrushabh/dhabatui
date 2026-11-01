@@ -17,8 +17,20 @@ jobs:
 
     name: Run PR Agent (/describe, /review, /improve)
     steps:
+      - name: Check for AI API Key
+        id: check_keys
+        run: |
+          if [ -n "${{ secrets.OPENAI_KEY }}" ] || [ -n "${{ secrets.GEMINI_API_KEY }}" ] || [ -n "${{ secrets.GEMINI_KEY }}" ]; then
+            echo "has_key=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_key=false" >> "$GITHUB_OUTPUT"
+            echo "::notice ::No OPENAI_KEY or GEMINI_API_KEY secret configured in repository settings. Set OPENAI_KEY or GEMINI_API_KEY in repo Settings > Secrets and variables > Actions to enable automated PR-Agent reviews."
+          fi
+
       - name: PR Agent action step
+        if: steps.check_keys.outputs.has_key == 'true'
         id: pragent
+        continue-on-error: true
         uses: the-pr-agent/pr-agent@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
