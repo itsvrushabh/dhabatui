@@ -1,6 +1,7 @@
 [config]
 model = "gemini/gemini-1.5-flash"
-fallback_models = ["gemini/gemini-2.5-flash", "gemini/gemini-1.5-pro"]
+fallback_models = ["gemini/gemini-1.5-pro"]
+custom_model_max_tokens = 32000
 publish_output = true
 
 [github_action_config]
