@@ -111,6 +111,7 @@ impl App {
         Ok(app)
     }
 
+    #[allow(dead_code)]
     pub fn lan_url(&self) -> Option<&str> {
         self.web_handle.as_ref().map(|h| h.lan_url.as_str())
     }
