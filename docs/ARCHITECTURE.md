@@ -43,11 +43,20 @@ flowchart TD
         ReceiptExporter["receipt.txt & receipts/bill_N.txt"]
     end
 
+    subgraph Web ["Embedded LAN Web Server (web.rs)"]
+        HttpServer["tiny_http background thread"]
+        LanFilter["Private IP Validator (127.0.0.1, 192.168.x.x, 10.x.x.x)"]
+        LivePage["dashboard.html (Live Auto-Polling)"]
+    end
+
     RawMode --> EventLoop
     EventLoop -->|Key Events| App
     App --> PaneState
     App --> InputModeState
     App --> ToastState
+    App -->|Sync Status| HttpServer
+    HttpServer --> LanFilter
+    LanFilter --> LivePage
 
     App -.->|Audit Trails| Tracer
     Tracer --> LogFile
@@ -112,7 +121,16 @@ DhabaTUI isolates all runtime logging using `tracing` and `tracing-appender`:
 
 ---
 
-## 4. Terminal Lifecycle & Custom Panic Hook
+## 4. Embedded LAN Read-Only Web Server
+
+DhabaTUI includes a zero-runtime embedded web server powered by `tiny_http`:
+- **Port Binding**: Binds to `0.0.0.0:8080` (auto-falling back to 8081..8089 if occupied).
+- **Private Network Security**: Every incoming connection is verified against `is_lan_ip(&remote_addr)`. Only loopback (`127.0.0.1`), RFC 1918 private IPv4 (`192.168.x.x`, `10.x.x.x`, `172.16-31.x.x`), and link-local addresses are served. All other traffic receives `403 Forbidden`.
+- **Auto-Syncing**: The frontend polls `GET /api/status` every 2 seconds, receiving live table states, items, and recent bills.
+
+---
+
+## 5. Terminal Lifecycle & Custom Panic Hook
 
 To prevent terminal corruption on unexpected program panics, a custom panic hook is installed at application startup:
 

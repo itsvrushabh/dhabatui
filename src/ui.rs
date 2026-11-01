@@ -1,5 +1,5 @@
 use crate::app::{ActivePane, App, InputMode, ToastType};
-use crate::models::{format_paise, BillSummary};
+use crate::models::{format_paise, TableStatus};
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
@@ -14,17 +14,19 @@ pub fn render(f: &mut Frame, app: &mut App) {
     let main_chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
-            Constraint::Length(3), // Header banner
-            Constraint::Min(10),   // Content (Menu + Cart)
+            Constraint::Length(3), // Header banner with LAN URL
+            Constraint::Length(3), // Interactive Tables Bar (T1..T8, Parcel)
+            Constraint::Min(10),   // Content (Menu + Current Table Order)
             Constraint::Length(1), // Toast / Status line
             Constraint::Length(1), // Hotkey guide footer
         ])
         .split(f.area());
 
     render_header(f, app, main_chunks[0]);
-    render_body(f, app, main_chunks[1]);
-    render_status_bar(f, app, main_chunks[2]);
-    render_footer(f, app, main_chunks[3]);
+    render_table_bar(f, app, main_chunks[1]);
+    render_body(f, app, main_chunks[2]);
+    render_status_bar(f, app, main_chunks[3]);
+    render_footer(f, app, main_chunks[4]);
 
     // Render interactive modal if in input mode
     match app.input_mode {
@@ -42,6 +44,12 @@ fn render_header(f: &mut Frame, app: &App, area: Rect) {
         String::new()
     };
 
+    let lan_info = if let Some(url) = app.lan_url() {
+        format!("  🌐 LAN Live Web: {url} (Network Only)")
+    } else {
+        "  🌐 LAN: Initializing...".to_string()
+    };
+
     let title_line = Line::from(vec![
         Span::styled(
             " 🍲 DHABA TUI ",
@@ -51,8 +59,14 @@ fn render_header(f: &mut Frame, app: &App, area: Rect) {
                 .add_modifier(Modifier::BOLD),
         ),
         Span::styled(
-            "  Smart POS & Billing System (redb ACID Engine)",
+            "  Smart POS & Billing System",
             Style::default().fg(Color::Cyan),
+        ),
+        Span::styled(
+            lan_info,
+            Style::default()
+                .fg(Color::Green)
+                .add_modifier(Modifier::BOLD),
         ),
         Span::styled(
             quick_code_indicator,
@@ -74,12 +88,75 @@ fn render_header(f: &mut Frame, app: &App, area: Rect) {
     f.render_widget(paragraph, area);
 }
 
+fn render_table_bar(f: &mut Frame, app: &App, area: Rect) {
+    let mut spans = Vec::new();
+    spans.push(Span::styled(
+        " Tables: ",
+        Style::default().fg(Color::DarkGray),
+    ));
+
+    for (idx, table) in app.tables.iter().enumerate() {
+        let is_active = idx == app.active_table_idx;
+        let summary = table.summary();
+
+        let status_color = match table.status {
+            TableStatus::Vacant => Color::DarkGray,
+            TableStatus::Ordering => Color::Yellow,
+            TableStatus::Served => Color::Cyan,
+            TableStatus::Billed => Color::Green,
+        };
+
+        let badge = if table.status == TableStatus::Vacant {
+            format!(" {} ", table.id)
+        } else {
+            format!(
+                " {}: {} ({}) ",
+                table.id,
+                format_paise(summary.total_paise),
+                table.status.as_str()
+            )
+        };
+
+        if is_active {
+            spans.push(Span::styled(
+                format!("▶{badge}◀"),
+                Style::default()
+                    .fg(Color::Black)
+                    .bg(Color::Cyan)
+                    .add_modifier(Modifier::BOLD),
+            ));
+        } else {
+            spans.push(Span::styled(
+                badge,
+                Style::default()
+                    .fg(status_color)
+                    .add_modifier(Modifier::BOLD),
+            ));
+        }
+        spans.push(Span::raw(" "));
+    }
+
+    let block = Block::default()
+        .borders(Borders::ALL)
+        .border_type(BorderType::Rounded)
+        .border_style(Style::default().fg(Color::DarkGray))
+        .title(Span::styled(
+            " Dining Tables & Takeaway (Press 't' to cycle, 's' to toggle status) ",
+            Style::default()
+                .fg(Color::White)
+                .add_modifier(Modifier::BOLD),
+        ));
+
+    let paragraph = Paragraph::new(Line::from(spans)).block(block);
+    f.render_widget(paragraph, area);
+}
+
 fn render_body(f: &mut Frame, app: &mut App, area: Rect) {
     let body_chunks = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([
             Constraint::Percentage(50), // Left: Menu
-            Constraint::Percentage(50), // Right: Cart & Summary
+            Constraint::Percentage(50), // Right: Active Table Order & Summary
         ])
         .split(area);
 
@@ -134,7 +211,7 @@ fn render_menu(f: &mut Frame, app: &mut App, area: Rect) {
         .collect();
 
     let title = if is_focused {
-        " [1] Menu Catalog ▶ (Enter: Add | Digits: Quick Code) "
+        " [1] Menu Catalog ▶ (Enter: Add to Table | Digits: Quick Code) "
     } else {
         " [1] Menu Catalog (Press Tab or 'h' to Focus) "
     };
@@ -203,8 +280,9 @@ fn render_cart(f: &mut Frame, app: &mut App, area: Rect) {
     )
     .bottom_margin(1);
 
-    let rows: Vec<Row> = app
-        .cart
+    let active_table = app.active_table();
+    let rows: Vec<Row> = active_table
+        .items
         .iter()
         .map(|item| {
             let name_span = if item.is_custom {
@@ -242,11 +320,11 @@ fn render_cart(f: &mut Frame, app: &mut App, area: Rect) {
         })
         .collect();
 
-    let title = if is_focused {
-        " [2] Current Order ▶ (+/- Qty | e: Edit Price | d: Del) "
-    } else {
-        " [2] Current Order (Press Tab or 'l' to Focus) "
-    };
+    let title = format!(
+        " [2] Order: {} [{}] ▶ (+/- Qty | e: Edit Price | d: Del) ",
+        active_table.label,
+        active_table.status.as_str()
+    );
 
     let widths = [
         Constraint::Length(8),
@@ -293,7 +371,7 @@ fn cell_styled<'a>(text: &'a str, color: Color) -> Span<'a> {
 }
 
 fn render_summary(f: &mut Frame, app: &App, area: Rect) {
-    let summary = BillSummary::calculate(&app.cart);
+    let summary = app.active_table().summary();
 
     let summary_lines = vec![
         Line::from(vec![
@@ -348,7 +426,7 @@ fn render_summary(f: &mut Frame, app: &App, area: Rect) {
         .border_type(BorderType::Rounded)
         .border_style(Style::default().fg(Color::DarkGray))
         .title(Span::styled(
-            " Bill & Tax Summary (5% GST) ",
+            format!(" Bill & Tax (5% GST) - {} ", app.active_table().label),
             Style::default()
                 .fg(Color::White)
                 .add_modifier(Modifier::BOLD),
@@ -376,7 +454,7 @@ fn render_status_bar(f: &mut Frame, app: &App, area: Rect) {
         (format!(" {toast_msg} "), st)
     } else {
         (
-            " Ready. Press 'p' to settle order, 'm' for custom making charges.".to_string(),
+            " Ready. 't': Switch Table | 's': Toggle Status | 'p': Settle & Print.".to_string(),
             Style::default().fg(Color::DarkGray),
         )
     };
@@ -387,6 +465,20 @@ fn render_status_bar(f: &mut Frame, app: &App, area: Rect) {
 
 fn render_footer(f: &mut Frame, _app: &App, area: Rect) {
     let keys = vec![
+        Span::styled(
+            "t",
+            Style::default()
+                .fg(Color::Yellow)
+                .add_modifier(Modifier::BOLD),
+        ),
+        Span::raw(":Table | "),
+        Span::styled(
+            "s",
+            Style::default()
+                .fg(Color::Cyan)
+                .add_modifier(Modifier::BOLD),
+        ),
+        Span::raw(":Status | "),
         Span::styled(
             "Tab",
             Style::default()
@@ -423,22 +515,12 @@ fn render_footer(f: &mut Frame, _app: &App, area: Rect) {
         ),
         Span::raw(":Making Chg | "),
         Span::styled(
-            "d",
-            Style::default().fg(Color::Red).add_modifier(Modifier::BOLD),
-        ),
-        Span::raw(":Del | "),
-        Span::styled(
-            "c",
-            Style::default().fg(Color::Red).add_modifier(Modifier::BOLD),
-        ),
-        Span::raw(":Clear | "),
-        Span::styled(
             "p",
             Style::default()
                 .fg(Color::Green)
                 .add_modifier(Modifier::BOLD),
         ),
-        Span::raw(":Settle & Print | "),
+        Span::raw(":Settle | "),
         Span::styled(
             "q",
             Style::default()
@@ -481,7 +563,7 @@ fn render_edit_price_modal(f: &mut Frame, app: &App) {
     let item_name = app
         .cart_state
         .selected()
-        .and_then(|i| app.cart.get(i))
+        .and_then(|i| app.active_table().items.get(i))
         .map(|it| it.name.as_str())
         .unwrap_or("Selected Item");
 

@@ -26,7 +26,7 @@ impl MenuItem {
     }
 }
 
-/// An item line in the active billing cart.
+/// An item line in an order / active cart.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CartItem {
     pub code: String,
@@ -67,6 +67,65 @@ impl CartItem {
     /// Computes the total for this line item in paise.
     pub fn line_total_paise(&self) -> u32 {
         self.price_paise.saturating_mul(self.quantity)
+    }
+}
+
+/// Status of a dining table or order counter.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum TableStatus {
+    Vacant,
+    Ordering,
+    Served,
+    Billed,
+}
+
+impl TableStatus {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            TableStatus::Vacant => "Vacant",
+            TableStatus::Ordering => "Ordering",
+            TableStatus::Served => "Served",
+            TableStatus::Billed => "Billed",
+        }
+    }
+
+    pub fn color_code(&self) -> &'static str {
+        match self {
+            TableStatus::Vacant => "#718096",   // Slate gray
+            TableStatus::Ordering => "#f59e0b", // Amber
+            TableStatus::Served => "#06b6d4",   // Cyan
+            TableStatus::Billed => "#10b981",   // Green
+        }
+    }
+}
+
+/// Active dining table with its cart and operational status.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TableOrder {
+    pub id: String,
+    pub label: String,
+    pub status: TableStatus,
+    pub items: Vec<CartItem>,
+    pub opened_at: Option<String>,
+}
+
+impl TableOrder {
+    pub fn new(id: impl Into<String>, label: impl Into<String>) -> Self {
+        Self {
+            id: id.into(),
+            label: label.into(),
+            status: TableStatus::Vacant,
+            items: Vec::new(),
+            opened_at: None,
+        }
+    }
+
+    pub fn summary(&self) -> BillSummary {
+        BillSummary::calculate(&self.items)
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.items.is_empty()
     }
 }
 
@@ -128,6 +187,7 @@ impl BillSummary {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct BillRecord {
     pub id: u64,
+    pub table_id: String,
     pub timestamp: String,
     pub items: Vec<CartItem>,
     pub summary: BillSummary,
@@ -172,7 +232,6 @@ pub fn parse_rupees_to_paise(input: &str) -> Result<u32, String> {
                 .parse()
                 .map_err(|_| format!("Invalid paise decimal: '{paise_str}'"))?,
             _ => {
-                // Truncate/round to 2 decimals
                 let two_digits = &paise_str[..2];
                 two_digits
                     .parse()
@@ -237,15 +296,30 @@ mod tests {
         ];
 
         let summary = BillSummary::calculate(&items);
-        // Subtotal = 2 * 13000 + 4 * 4500 = 26000 + 18000 = 44000 (₹440.00)
         assert_eq!(summary.subtotal_paise, 44000);
-        // CGST (2.5%) = 44000 * 25 / 1000 = 1100 (₹11.00)
         assert_eq!(summary.cgst_paise, 1100);
-        // SGST (2.5%) = 1100 (₹11.00)
         assert_eq!(summary.sgst_paise, 1100);
-        // Grand Total = 44000 + 1100 + 1100 = 46200 (₹462.00)
         assert_eq!(summary.total_paise, 46200);
         assert_eq!(summary.total_items, 6);
         assert_eq!(summary.total_lines, 2);
+    }
+
+    #[test]
+    fn test_table_order_lifecycle() {
+        let mut table = TableOrder::new("T1", "Table 1");
+        assert_eq!(table.status, TableStatus::Vacant);
+        assert!(table.is_empty());
+
+        table.items.push(CartItem {
+            code: "101".to_string(),
+            name: "Dal Tadka".to_string(),
+            price_paise: 13000,
+            quantity: 1,
+            is_custom: false,
+        });
+        table.status = TableStatus::Ordering;
+
+        assert_eq!(table.summary().total_paise, 13650);
+        assert_eq!(table.status.as_str(), "Ordering");
     }
 }

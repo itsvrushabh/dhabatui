@@ -197,9 +197,27 @@ impl Database {
         Ok(items)
     }
 
+    /// Retrieves the most recent N bills from the database.
+    pub fn get_recent_bills(&self, limit: usize) -> Result<Vec<BillRecord>, DbError> {
+        let read_txn = self.db.begin_read()?;
+        let table = read_txn.open_table(BILLS_TABLE)?;
+
+        let mut bills = Vec::new();
+        for row in table.iter()? {
+            let (_key, val) = row?;
+            let record: BillRecord = serde_json::from_slice(val.value())?;
+            bills.push(record);
+        }
+
+        bills.sort_by_key(|a| std::cmp::Reverse(a.id));
+        bills.truncate(limit);
+        Ok(bills)
+    }
+
     /// Atomically records a finalized bill into `redb` and exports a receipt file.
     pub fn save_bill(
         &self,
+        table_id: &str,
         items: &[CartItem],
         summary: &BillSummary,
     ) -> Result<BillRecord, DbError> {
@@ -220,6 +238,7 @@ impl Database {
             let mut bills_table = write_txn.open_table(BILLS_TABLE)?;
             let record = BillRecord {
                 id: bill_id,
+                table_id: table_id.to_string(),
                 timestamp: timestamp.clone(),
                 items: items.to_vec(),
                 summary: summary.clone(),
@@ -232,12 +251,14 @@ impl Database {
         write_txn.commit()?;
         tracing::info!(
             bill_id,
+            table = table_id,
             total = format_paise(summary.total_paise),
             "Bill committed to redb"
         );
 
         let record = BillRecord {
             id: bill_id,
+            table_id: table_id.to_string(),
             timestamp,
             items: items.to_vec(),
             summary: summary.clone(),
@@ -259,8 +280,8 @@ impl Database {
         buffer.push_str("                      DHABA TUI BILL\n");
         buffer.push_str("============================================================\n");
         buffer.push_str(&format!(
-            "Bill No: #{:<22} Date: {}\n",
-            bill.id, bill.timestamp
+            "Bill No: #{:<16} Table: {:<8} Date: {}\n",
+            bill.id, bill.table_id, bill.timestamp
         ));
         buffer.push_str("------------------------------------------------------------\n");
         buffer.push_str("Item                            Qty    Price        Total\n");
@@ -373,15 +394,17 @@ mod tests {
         ];
 
         let summary = BillSummary::calculate(&items);
-        let bill = db.save_bill(&items, &summary).unwrap();
+        let bill = db.save_bill("T1", &items, &summary).unwrap();
 
         assert_eq!(bill.id, 101);
+        assert_eq!(bill.table_id, "T1");
         assert_eq!(bill.summary.subtotal_paise, 24000); // 18000 + 4*1500 = 24000
         assert_eq!(bill.items.len(), 2);
 
         // Second bill should have incremented ID
-        let bill2 = db.save_bill(&items, &summary).unwrap();
+        let bill2 = db.save_bill("T2", &items, &summary).unwrap();
         assert_eq!(bill2.id, 102);
+        assert_eq!(bill2.table_id, "T2");
 
         // Check receipt file creation
         let receipt_path = dir.path().join("receipt.txt");
