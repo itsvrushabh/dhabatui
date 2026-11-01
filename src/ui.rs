@@ -504,6 +504,13 @@ fn render_footer(f: &mut Frame, _app: &App, area: Rect) {
         ),
         Span::raw(":Making Chg | "),
         Span::styled(
+            "K",
+            Style::default()
+                .fg(Color::LightYellow)
+                .add_modifier(Modifier::BOLD),
+        ),
+        Span::raw(":KOT | "),
+        Span::styled(
             "p",
             Style::default()
                 .fg(Color::Green)

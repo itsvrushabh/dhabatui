@@ -348,6 +348,56 @@ impl Database {
         tracing::info!(path = %latest_path.display(), "Exported latest receipt");
         Ok(buffer)
     }
+
+    /// Records sequential KOT ticket and writes printable slip to `kot.txt` and `receipts/kot_{table_id}_{kot_id}.txt`.
+    pub fn save_and_export_kot(
+        &self,
+        table_id: &str,
+        table_label: &str,
+        items: &[CartItem],
+    ) -> Result<(u64, String), DbError> {
+        let write_txn = self.db.begin_write()?;
+        let kot_id;
+        let timestamp = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+
+        {
+            let mut meta_table = write_txn.open_table(META_TABLE)?;
+            let current_id = meta_table
+                .get("next_kot_id")?
+                .map(|val| val.value())
+                .unwrap_or(1);
+
+            kot_id = current_id;
+            meta_table.insert("next_kot_id", current_id + 1)?;
+        }
+
+        write_txn.commit()?;
+        tracing::info!(
+            kot_id,
+            table = table_id,
+            items_count = items.len(),
+            "KOT recorded"
+        );
+
+        let kot_content =
+            crate::models::generate_kot_slip(table_id, table_label, kot_id, items, &timestamp);
+
+        // Export latest kot.txt
+        let latest_path = self.base_dir.join("kot.txt");
+        let mut file = File::create(&latest_path)?;
+        file.write_all(kot_content.as_bytes())?;
+
+        // Archive into receipts/ directory
+        let receipts_dir = self.base_dir.join("receipts");
+        let _ = fs::create_dir_all(&receipts_dir);
+        let archive_path = receipts_dir.join(format!("kot_{}_{}.txt", table_id, kot_id));
+        if let Ok(mut archive_file) = File::create(&archive_path) {
+            let _ = archive_file.write_all(kot_content.as_bytes());
+        }
+
+        tracing::info!(path = %latest_path.display(), "Exported kitchen order ticket (KOT)");
+        Ok((kot_id, kot_content))
+    }
 }
 
 #[cfg(test)]
@@ -409,5 +459,16 @@ mod tests {
         // Check receipt file creation
         let receipt_path = dir.path().join("receipt.txt");
         assert!(receipt_path.exists());
+
+        // Test KOT generation and sequential numbering
+        let (kot_id, kot_slip) = db.save_and_export_kot("T1", "Table 1", &items).unwrap();
+        assert_eq!(kot_id, 1);
+        assert!(kot_slip.contains("KOT #: #1"));
+        assert!(kot_slip.contains("Table 1 (T1)"));
+        assert!(dir.path().join("kot.txt").exists());
+
+        // Second KOT increments ticket ID
+        let (kot_id2, _) = db.save_and_export_kot("T2", "Table 2", &items).unwrap();
+        assert_eq!(kot_id2, 2);
     }
 }

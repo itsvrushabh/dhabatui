@@ -108,7 +108,16 @@ With the **Current Order** pane focused:
 
 ---
 
-### 8. Settle & Print Receipt
+### 8. Kitchen Order Ticket (KOT) Dispatch
+When food is ordered and needs to be prepared by the kitchen / tandoor master:
+- Press **`K`** (or **`o`**) from anywhere in the counter.
+- A sequential Kitchen Order Ticket (e.g. `KOT #1`) is dispatched and exported to [`kot.txt`](../kot.txt) for immediate kitchen thermal printing, and archived to `receipts/kot_<table_id>_<kot_id>.txt`.
+- The KOT slip lists dish names, custom meat preparation notes (*Banwai*), and quantities, completely omitting billing totals, taxes, and prices.
+- Automatically transitions table status to `Ordering`.
+
+---
+
+### 9. Settle & Print Receipt
 When the customer is ready to pay:
 - Press **`p`** anywhere.
 - The active table's order is atomically committed to `redb` under a sequential invoice number (e.g. `#101`) tagged with the table ID.
@@ -135,6 +144,7 @@ When the customer is ready to pay:
 | **`-`** | Cart Pane | Decrease quantity of selected item |
 | **`e`** / **`E`** | Cart Pane | **Alter price on the go**: modal prompt to override unit price |
 | **`m`** / **`M`** | Global | **Add Custom / Making Charge**: modal for dish description & price |
+| **`K`** / **`o`** | Global | **Kitchen Order Ticket (KOT)**: dispatch cooking slip to `kot.txt` without prices |
 | **`d`** / **`D`** | Cart Pane | Delete selected item line from order |
 | **`c`** / **`C`** | Global | Clear active table's order |
 | **`p`** / **`P`** | Global | **Settle & Print**: commit to `redb`, write `receipt.txt`, and clear table |

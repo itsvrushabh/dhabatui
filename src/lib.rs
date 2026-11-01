@@ -138,6 +138,9 @@ fn run_app<B: ratatui::backend::Backend>(
                         KeyCode::Char('m') | KeyCode::Char('M') => {
                             app.start_custom_item();
                         }
+                        KeyCode::Char('K') | KeyCode::Char('o') | KeyCode::Char('O') => {
+                            let _ = app.generate_kot();
+                        }
                         KeyCode::Char('p') | KeyCode::Char('P') => {
                             let _ = app.settle_and_print();
                         }

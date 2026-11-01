@@ -538,6 +538,48 @@ impl App {
         }
     }
 
+    // --- Kitchen Order Ticket (KOT) Generation ---
+
+    pub fn generate_kot(&mut self) -> Result<Option<u64>, DbError> {
+        let table = self.active_table();
+        if table.items.is_empty() {
+            self.set_toast(
+                format!(
+                    "{}: Order is empty! Add dishes before printing KOT.",
+                    table.label
+                ),
+                ToastType::Error,
+            );
+            return Ok(None);
+        }
+
+        let table_id = table.id.clone();
+        let table_label = table.label.clone();
+        let items = table.items.clone();
+
+        match self.db.save_and_export_kot(&table_id, &table_label, &items) {
+            Ok((kot_id, _slip)) => {
+                let msg = format!(
+                    "✓ KOT #{kot_id} printed for {table_label}! Dispatch slip saved to kot.txt"
+                );
+                // Transition table status from Vacant to Ordering if needed
+                let t = &mut self.tables[self.active_table_idx];
+                if t.status == TableStatus::Vacant {
+                    t.status = TableStatus::Ordering;
+                    t.opened_at = Some(Local::now().format("%H:%M:%S").to_string());
+                }
+                self.set_toast(msg, ToastType::Success);
+                self.sync_web_dashboard();
+                Ok(Some(kot_id))
+            }
+            Err(err) => {
+                tracing::error!(%err, "Error generating KOT");
+                self.set_toast(format!("Failed to generate KOT: {err}"), ToastType::Error);
+                Err(err)
+            }
+        }
+    }
+
     // --- Settle & Print Bill ---
 
     pub fn settle_and_print(&mut self) -> Result<Option<BillRecord>, DbError> {
@@ -597,8 +639,8 @@ mod tests {
     use tempfile::tempdir;
 
     fn setup_test_app() -> App {
-        let dir = tempdir().unwrap();
-        let db_path = dir.path().join("app_test.redb");
+        let dir = tempdir().unwrap().keep();
+        let db_path = dir.join("app_test.redb");
         let db = Database::open(&db_path).unwrap();
         App::new(db).unwrap()
     }
@@ -695,5 +737,21 @@ mod tests {
         assert_eq!(bill.summary.total_paise, 46200);
         assert!(app.active_table().items.is_empty());
         assert_eq!(app.active_table().status, TableStatus::Vacant);
+    }
+
+    #[test]
+    fn test_app_kot_workflow() {
+        let mut app = setup_test_app();
+        assert_eq!(app.active_table().status, TableStatus::Vacant);
+
+        // KOT on empty order fails gracefully
+        assert!(app.generate_kot().unwrap().is_none());
+
+        // Add item and generate KOT
+        assert!(app.add_item_by_code("101"));
+        let kot_id = app.generate_kot().unwrap().unwrap();
+        assert_eq!(kot_id, 1);
+        assert_eq!(app.active_table().status, TableStatus::Ordering);
+        assert!(app.toast.as_ref().unwrap().0.contains("KOT #1"));
     }
 }

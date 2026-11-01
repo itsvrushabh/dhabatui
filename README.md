@@ -102,6 +102,7 @@ dhabatui
 | **`+`** / **`-`** | Increment or decrement item quantity |
 | **`m`** | **Making Charges (*Banwai*)**: Add custom meat preparation |
 | **`e`** | **Alter Price**: Override unit price for active dish |
+| **`K`** / **`o`** | **Kitchen Order Ticket (KOT)**: Print cook dispatch slip to `kot.txt` without prices |
 | **`p`** | **Settle Bill**: Commit to `redb`, generate receipt, and clear table |
 | **`q`** / **`Esc`** | Exit DhabaTUI or close popup modal |
 

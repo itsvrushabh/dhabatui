@@ -200,6 +200,57 @@ pub fn format_paise(paise: u32) -> String {
     format!("₹{}.{:02}", rupees, fraction)
 }
 
+/// Formats an 80mm Kitchen Order Ticket (KOT) slip for chefs and tandoor masters.
+/// Omits pricing, subtotal, and tax lines.
+pub fn generate_kot_slip(
+    table_id: &str,
+    table_label: &str,
+    kot_number: u64,
+    items: &[CartItem],
+    timestamp: &str,
+) -> String {
+    let mut buffer = String::new();
+    buffer.push_str("============================================================\n");
+    buffer.push_str("               KITCHEN ORDER TICKET (KOT)                   \n");
+    buffer.push_str("============================================================\n");
+    buffer.push_str(&format!(
+        "KOT #: #{:<14} Table: {:<12} Time: {}\n",
+        kot_number,
+        if table_label != table_id {
+            format!("{table_label} ({table_id})")
+        } else {
+            table_id.to_string()
+        },
+        timestamp
+    ));
+    buffer.push_str("------------------------------------------------------------\n");
+    buffer.push_str("ITEM DESCRIPTION                                         QTY\n");
+    buffer.push_str("------------------------------------------------------------\n");
+
+    let mut total_qty: u32 = 0;
+    for item in items {
+        total_qty = total_qty.saturating_add(item.quantity);
+        let name_display = if item.is_custom {
+            format!("* [SPECIAL] {}", item.name)
+        } else {
+            format!("[{}] {}", item.code, item.name)
+        };
+        let truncated = if name_display.len() > 50 {
+            &name_display[..50]
+        } else {
+            &name_display
+        };
+        buffer.push_str(&format!("{:<52} {:>6}\n", truncated, item.quantity));
+    }
+
+    buffer.push_str("------------------------------------------------------------\n");
+    buffer.push_str(&format!("TOTAL DISH QUANTITY: {:>37}\n", total_qty));
+    buffer.push_str("============================================================\n");
+    buffer.push_str("               DISPATCH IMMEDIATELY TO COOK                 \n");
+    buffer.push_str("============================================================\n");
+    buffer
+}
+
 /// Parses an input string representing Rupees (e.g. "140", "140.50", "₹180.00")
 /// into integer paise.
 pub fn parse_rupees_to_paise(input: &str) -> Result<u32, String> {
@@ -321,5 +372,38 @@ mod tests {
 
         assert_eq!(table.summary().total_paise, 13650);
         assert_eq!(table.status.as_str(), "Ordering");
+    }
+
+    #[test]
+    fn test_kot_slip_generation() {
+        let items = vec![
+            CartItem {
+                code: "101".to_string(),
+                name: "Dal Tadka".to_string(),
+                price_paise: 13000,
+                quantity: 2,
+                is_custom: false,
+            },
+            CartItem {
+                code: "401".to_string(),
+                name: "1/2kg Mutton Masala (Making)".to_string(),
+                price_paise: 18000,
+                quantity: 1,
+                is_custom: true,
+            },
+        ];
+
+        let kot = generate_kot_slip("T1", "Table 1", 5, &items, "2026-11-01 13:00:00");
+        assert!(kot.contains("KITCHEN ORDER TICKET (KOT)"));
+        assert!(kot.contains("KOT #: #5"));
+        assert!(kot.contains("Table 1 (T1)"));
+        assert!(kot.contains("[101] Dal Tadka"));
+        assert!(kot.contains("* [SPECIAL] 1/2kg Mutton Masala (Making)"));
+        assert!(kot.contains("TOTAL DISH QUANTITY:"));
+        assert!(kot.contains('3'));
+        // Assert no pricing exists in KOT slip
+        assert!(!kot.contains('₹'));
+        assert!(!kot.contains("Subtotal"));
+        assert!(!kot.contains("GST"));
     }
 }
