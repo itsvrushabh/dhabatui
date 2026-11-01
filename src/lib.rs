@@ -3,6 +3,7 @@ pub mod db;
 pub mod logger;
 pub mod models;
 pub mod ui;
+pub mod web;
 
 use app::{ActivePane, App, InputMode};
 use crossterm::{
@@ -89,6 +90,15 @@ fn run_app<B: ratatui::backend::Backend>(
                     InputMode::Normal => match key.code {
                         KeyCode::Char('q') | KeyCode::Esc => {
                             app.should_quit = true;
+                        }
+                        KeyCode::Char('t') | KeyCode::Char('T') => {
+                            app.next_table();
+                        }
+                        KeyCode::BackTab => {
+                            app.previous_table();
+                        }
+                        KeyCode::Char('s') | KeyCode::Char('S') => {
+                            app.toggle_active_table_status();
                         }
                         KeyCode::Tab => {
                             app.toggle_pane();

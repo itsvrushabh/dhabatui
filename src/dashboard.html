@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DhabaTUI Live Orders Dashboard</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #151c2c;
+      --card-border: #232f48;
+      --text-main: #f1f5f9;
+      --text-dim: #94a3b8;
+      --accent-yellow: #f59e0b;
+      --accent-green: #10b981;
+      --accent-cyan: #06b6d4;
+      --accent-purple: #a855f7;
+      --accent-red: #ef4444;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 16px;
+      line-height: 1.5;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand .tag {
+      background: var(--accent-yellow);
+      color: #000;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    .meta-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.85rem;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+    }
+
+    .pulse-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 10px var(--accent-green);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .kpi-card .label {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .kpi-card .val {
+      font-size: 1.8rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--text-main);
+    }
+
+    .kpi-card.revenue .val {
+      color: var(--accent-green);
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tables-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .table-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.15s ease, border-color 0.2s ease;
+    }
+
+    .table-card.active-order {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 4px 20px rgba(6, 182, 212, 0.08);
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .table-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .status-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .order-items {
+      flex: 1;
+      min-height: 80px;
+      margin-bottom: 12px;
+    }
+
+    .order-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      font-size: 0.9rem;
+    }
+
+    .order-item-name {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-main);
+    }
+
+    .custom-pill {
+      font-size: 0.65rem;
+      background: var(--accent-purple);
+      color: #fff;
+      padding: 1px 4px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .qty-tag {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--accent-cyan);
+    }
+
+    .table-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding-top: 10px;
+      border-top: 1px dashed var(--card-border);
+      font-family: var(--font-mono);
+    }
+
+    .table-total {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--accent-green);
+    }
+
+    .empty-state {
+      color: var(--text-dim);
+      font-style: italic;
+      font-size: 0.85rem;
+      padding: 24px 0;
+      text-align: center;
+    }
+
+    .recent-bills {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
+      overflow-x: auto;
+    }
+
+    table.bills-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+
+    table.bills-table th, table.bills-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    table.bills-table th {
+      color: var(--text-dim);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+    }
+
+    table.bills-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <h1>🍲 DhabaTUI <span class="tag">Live Kitchen &amp; Tables</span></h1>
+    </div>
+    <div class="meta-bar">
+      <span><span class="pulse-dot"></span> LAN Connected</span>
+      <span id="lan-url">Detecting...</span>
+      <span id="sync-time">--:--:--</span>
+    </div>
+  </header>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="label">Occupied Tables</div>
+      <div class="val" id="kpi-occupied">0</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">Kitchen / Active Items</div>
+      <div class="val" id="kpi-items">0</div>
+    </div>
+    <div class="kpi-card revenue">
+      <div class="label">Live Active Total</div>
+      <div class="val" id="kpi-revenue">₹0.00</div>
+    </div>
+  </div>
+
+  <h2 class="section-title">🪑 Live Dining Room &amp; Parcel Orders</h2>
+  <div class="tables-grid" id="tables-container">
+    <!-- Populated dynamically via JS -->
+  </div>
+
+  <h2 class="section-title">🧾 Recent Completed Bills</h2>
+  <div class="recent-bills">
+    <table class="bills-table">
+      <thead>
+        <tr>
+          <th>Bill #</th>
+          <th>Table</th>
+          <th>Time</th>
+          <th>Items</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody id="bills-tbody">
+        <tr><td colspan="5" style="text-align:center; color:var(--text-dim);">No settled bills yet</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer>
+    DhabaTUI Local Network Read-Only Dashboard • Powered by pure Rust &amp; redb
+  </footer>
+
+  <script>
+    async function updateDashboard() {
+      try {
+        const res = await fetch('/api/status');
+        if (!res.ok) return;
+        const data = await res.json();
+
+        // Update header & KPIs
+        document.getElementById('lan-url').textContent = data.lan_url;
+        document.getElementById('sync-time').textContent = 'Synced: ' + data.updated_at;
+        document.getElementById('kpi-occupied').textContent = data.total_active_tables;
+        document.getElementById('kpi-revenue').textContent = data.total_live_revenue_formatted;
+
+        let totalItemsInKitchen = 0;
+        data.tables.forEach(t => {
+          totalItemsInKitchen += t.total_items;
+        });
+        document.getElementById('kpi-items').textContent = totalItemsInKitchen;
+
+        // Render Table Cards
+        const container = document.getElementById('tables-container');
+        container.innerHTML = '';
+
+        data.tables.forEach(t => {
+          const card = document.createElement('div');
+          const isOccupied = t.status !== 'Vacant';
+          card.className = 'table-card' + (isOccupied ? ' active-order' : '');
+
+          let itemsHtml = '';
+          if (t.items && t.items.length > 0) {
+            itemsHtml = t.items.map(it => `
+              <div class="order-item-row">
+                <span class="order-item-name">
+                  <span class="qty-tag">${it.quantity}x</span>
+                  ${it.is_custom ? '<span class="custom-pill">Making</span>' : ''}
+                  ${escapeHtml(it.name)}
+                </span>
+                <span style="font-family:var(--font-mono); font-size:0.85rem; color:var(--text-dim);">${it.total_formatted}</span>
+              </div>
+            `).join('');
+          } else {
+            itemsHtml = `<div class="empty-state">No active items</div>`;
+          }
+
+          card.innerHTML = `
+            <div class="table-header">
+              <span class="table-name">${escapeHtml(t.label)}</span>
+              <span class="status-badge" style="background:${t.status_color}22; color:${t.status_color}; border:1px solid ${t.status_color}55;">
+                ${escapeHtml(t.status)}
+              </span>
+            </div>
+            <div class="order-items">
+              ${itemsHtml}
+            </div>
+            <div class="table-footer">
+              <span style="font-size:0.8rem; color:var(--text-dim);">${t.opened_at ? 'Opened ' + t.opened_at : 'Ready'}</span>
+              <span class="table-total">${t.total_formatted}</span>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+
+        // Render Recent Bills
+        const tbody = document.getElementById('bills-tbody');
+        if (data.recent_bills && data.recent_bills.length > 0) {
+          tbody.innerHTML = data.recent_bills.map(b => `
+            <tr>
+              <td style="font-family:var(--font-mono); font-weight:bold; color:var(--accent-yellow);">#${b.id}</td>
+              <td>${escapeHtml(b.table_id)}</td>
+              <td style="color:var(--text-dim);">${escapeHtml(b.timestamp)}</td>
+              <td>${b.items_count} items</td>
+              <td style="font-family:var(--font-mono); font-weight:bold; color:var(--accent-green);">${b.total_formatted}</td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-dim); padding:16px;">No settled bills yet</td></tr>`;
+        }
+
+      } catch (err) {
+        console.warn('Dashboard sync paused:', err);
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // Initial load and periodic poll every 2 seconds
+    updateDashboard();
+    setInterval(updateDashboard, 2000);
+  </script>
+</body>
+</html>
