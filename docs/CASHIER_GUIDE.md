@@ -77,7 +77,14 @@ Dhaba cashiers frequently memorize dish numbers for speed:
 
 ---
 
-### 5. Customer-Supplied Raw Meat / Making Charges (*Banwai*)
+### 5. Instant Search & Category Filter (`/` & `f`)
+When the menu expands and codes aren't memorized:
+- **Instant Text Search**: Press **`/`** to search by name or code in real time (e.g. type `pan` for Paneer). Press **`Enter`** to add the highlighted match or **`Esc`** to cancel.
+- **Cycle Category**: Press **`f`** to cycle through categories (`All` ➔ `Mains` ➔ `Breads` ➔ `Rice` ➔ `Making Charges` ➔ `Beverages`).
+
+---
+
+### 6. Customer-Supplied Raw Meat / Making Charges (*Banwai*)
 A hallmark of Indian highway dhabas: customers bring their own raw meat, chicken, or fish (e.g. *1 kg mutton*) and ask the cook to prepare it into separate dishes (*half kg masala, half kg fry*):
 
 1. Press **`m`** anywhere to open the **Making Charge Modal**.
@@ -129,6 +136,8 @@ When the customer is ready to pay:
 | **`l`** / **`Right`** | Global | Focus **Current Table Order** |
 | **`j`** / **`Down`** | Active Pane | Move selection cursor down |
 | **`k`** / **`Up`** | Active Pane | Move selection cursor up |
+| **`/`** | Menu Pane | **Instant Search**: filter catalog by dish name or code in real time |
+| **`f`** / **`F`** | Menu Pane | **Cycle Category Filter**: All ➔ Mains ➔ Breads ➔ Rice ➔ Making ➔ Drinks |
 | **`0`–`9`** | Menu Pane | Direct numeric quick code entry (e.g. `101` + `Enter`) |
 | **`Enter`** | Menu Pane | Add selected dish or increment count in active table's order |
 | **`+`** / **`=`** | Cart Pane | Increase quantity of selected item |

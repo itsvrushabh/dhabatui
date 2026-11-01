@@ -99,6 +99,8 @@ dhabatui
 | **`Tab`** / **`h`** / **`l`** | Switch focus between Menu Catalog and Order Cart |
 | **`0`–`9`** + **`Enter`** | Rapid numeric dish code entry (e.g. `101` + `Enter`) |
 | **`Enter`** | Add highlighted catalog dish to active table |
+| **`/`** | **Instant Search**: Real-time filtering by dish name or code |
+| **`f`** / **`F`** | **Category Filter**: Cycle Mains ➔ Breads ➔ Rice ➔ Making ➔ Drinks |
 | **`+`** / **`-`** | Increment or decrement item quantity |
 | **`m`** | **Making Charges (*Banwai*)**: Add custom meat preparation |
 | **`e`** | **Alter Price**: Override unit price for active dish |

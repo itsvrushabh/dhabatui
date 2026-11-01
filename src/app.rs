@@ -17,6 +17,7 @@ pub enum ActivePane {
 pub enum InputMode {
     Normal,
     QuickCode,
+    SearchingMenu,
     EditingPrice,
     AddingCustomName,
     AddingCustomPrice,
@@ -38,6 +39,8 @@ pub struct App {
     pub cart_state: TableState,
     pub active_pane: ActivePane,
     pub input_mode: InputMode,
+    pub search_query: String,
+    pub selected_category: Option<String>,
     pub quick_code_buffer: String,
     pub input_buffer: String,
     pub pending_custom_name: String,
@@ -81,6 +84,8 @@ impl App {
             cart_state,
             active_pane: ActivePane::Menu,
             input_mode: InputMode::Normal,
+            search_query: String::new(),
+            selected_category: None,
             quick_code_buffer: String::new(),
             input_buffer: String::new(),
             pending_custom_name: String::new(),
@@ -205,17 +210,93 @@ impl App {
         self.sync_web_dashboard();
     }
 
+    // --- Menu Filtering & Search ---
+
+    pub fn filtered_menu(&self) -> Vec<MenuItem> {
+        self.menu
+            .iter()
+            .filter(|item| {
+                if let Some(ref cat) = self.selected_category {
+                    if !item.category.eq_ignore_ascii_case(cat) {
+                        return false;
+                    }
+                }
+                if !self.search_query.is_empty() {
+                    let query = self.search_query.to_lowercase();
+                    let name_match = item.name.to_lowercase().contains(&query);
+                    let code_match = item.code.to_lowercase().contains(&query);
+                    let cat_match = item.category.to_lowercase().contains(&query);
+                    if !name_match && !code_match && !cat_match {
+                        return false;
+                    }
+                }
+                true
+            })
+            .cloned()
+            .collect()
+    }
+
+    pub fn available_categories(&self) -> Vec<String> {
+        let mut cats = Vec::new();
+        for item in &self.menu {
+            if !cats.contains(&item.category) {
+                cats.push(item.category.clone());
+            }
+        }
+        cats
+    }
+
+    pub fn cycle_category(&mut self) {
+        let cats = self.available_categories();
+        if cats.is_empty() {
+            return;
+        }
+        self.selected_category = match &self.selected_category {
+            None => Some(cats[0].clone()),
+            Some(current) => {
+                if let Some(pos) = cats.iter().position(|c| c == current) {
+                    if pos + 1 < cats.len() {
+                        Some(cats[pos + 1].clone())
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            }
+        };
+        self.reset_menu_selection();
+        let cat_label = self.selected_category.as_deref().unwrap_or("All");
+        self.set_toast(format!("Menu category: {cat_label}"), ToastType::Info);
+    }
+
+    pub fn reset_menu_selection(&mut self) {
+        let len = self.filtered_menu().len();
+        if len > 0 {
+            self.menu_state.select(Some(0));
+        } else {
+            self.menu_state.select(None);
+        }
+    }
+
+    pub fn clear_search_and_filter(&mut self) {
+        self.search_query.clear();
+        self.selected_category = None;
+        self.reset_menu_selection();
+    }
+
     // --- Pane & Item Navigation ---
 
     pub fn next_item(&mut self) {
         match self.active_pane {
             ActivePane::Menu => {
-                if self.menu.is_empty() {
+                let menu_len = self.filtered_menu().len();
+                if menu_len == 0 {
                     return;
                 }
                 let i = match self.menu_state.selected() {
                     Some(i) => {
-                        if i >= self.menu.len() - 1 {
+                        if i >= menu_len - 1 {
                             0
                         } else {
                             i + 1
@@ -248,13 +329,14 @@ impl App {
     pub fn previous_item(&mut self) {
         match self.active_pane {
             ActivePane::Menu => {
-                if self.menu.is_empty() {
+                let menu_len = self.filtered_menu().len();
+                if menu_len == 0 {
                     return;
                 }
                 let i = match self.menu_state.selected() {
                     Some(i) => {
                         if i == 0 {
-                            self.menu.len() - 1
+                            menu_len - 1
                         } else {
                             i - 1
                         }
@@ -298,8 +380,9 @@ impl App {
     // --- Cart Actions on Active Table ---
 
     pub fn add_selected_menu_item(&mut self) {
+        let filtered = self.filtered_menu();
         if let Some(i) = self.menu_state.selected() {
-            if let Some(menu_item) = self.menu.get(i).cloned() {
+            if let Some(menu_item) = filtered.get(i).cloned() {
                 self.add_or_increment_menu_item(&menu_item);
             }
         }
@@ -695,5 +778,34 @@ mod tests {
         assert_eq!(bill.summary.total_paise, 46200);
         assert!(app.active_table().items.is_empty());
         assert_eq!(app.active_table().status, TableStatus::Vacant);
+    }
+
+    #[test]
+    fn test_menu_search_and_category_filtering() {
+        let mut app = setup_test_app();
+        assert_eq!(app.filtered_menu().len(), app.menu.len());
+
+        // Category filter: Breads
+        app.selected_category = Some("Breads".to_string());
+        let breads = app.filtered_menu();
+        assert!(!breads.is_empty());
+        for item in &breads {
+            assert_eq!(item.category, "Breads");
+        }
+
+        // Search query: "tandoori"
+        app.search_query = "tandoori".to_string();
+        let roti_items = app.filtered_menu();
+        assert_eq!(roti_items.len(), 1);
+        assert_eq!(roti_items[0].name, "Tandoori Roti");
+
+        // Clear filter
+        app.clear_search_and_filter();
+        assert_eq!(app.filtered_menu().len(), app.menu.len());
+
+        // Cycle categories
+        let orig_cat = app.selected_category.clone();
+        app.cycle_category();
+        assert_ne!(app.selected_category, orig_cat);
     }
 }
