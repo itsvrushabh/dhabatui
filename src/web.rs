@@ -35,6 +35,7 @@ pub struct DashboardRecentBill {
     pub timestamp: String,
     pub total_formatted: String,
     pub items_count: u32,
+    pub payment_method: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -96,6 +97,7 @@ impl DashboardData {
                 timestamp: b.timestamp.clone(),
                 total_formatted: format_paise(b.summary.total_paise),
                 items_count: b.summary.total_items,
+                payment_method: b.payment_method.as_str().to_string(),
             })
             .collect();
 
@@ -266,12 +268,20 @@ mod tests {
         });
 
         let tables = vec![t1, TableOrder::new("T2", "Table 2")];
-        let recent = vec![];
+        let recent = vec![BillRecord {
+            id: 101,
+            table_id: "T1".to_string(),
+            timestamp: "2026-11-01 12:00:00".to_string(),
+            items: vec![],
+            summary: crate::models::BillSummary::default(),
+            payment_method: crate::models::PaymentMethod::Upi,
+        }];
         let data = DashboardData::build(&tables, &recent, "http://192.168.1.10:8080");
 
         assert_eq!(data.tables.len(), 2);
         assert_eq!(data.total_active_tables, 1);
         assert_eq!(data.tables[0].total_formatted, "₹273.00");
         assert_eq!(data.lan_url, "http://192.168.1.10:8080");
+        assert_eq!(data.recent_bills[0].payment_method, "UPI / Online");
     }
 }

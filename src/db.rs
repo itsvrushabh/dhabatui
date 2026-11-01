@@ -1,4 +1,4 @@
-use crate::models::{format_paise, BillRecord, BillSummary, CartItem, MenuItem};
+use crate::models::{format_paise, BillRecord, BillSummary, CartItem, MenuItem, PaymentMethod};
 use chrono::Local;
 use redb::{Database as RedbDatabase, ReadableTable, ReadableTableMetadata, TableDefinition};
 use std::fs::{self, File};
@@ -220,6 +220,7 @@ impl Database {
         table_id: &str,
         items: &[CartItem],
         summary: &BillSummary,
+        payment_method: PaymentMethod,
     ) -> Result<BillRecord, DbError> {
         let write_txn = self.db.begin_write()?;
         let bill_id;
@@ -242,6 +243,7 @@ impl Database {
                 timestamp: timestamp.clone(),
                 items: items.to_vec(),
                 summary: summary.clone(),
+                payment_method,
             };
 
             let serialized = serde_json::to_vec(&record)?;
@@ -252,6 +254,7 @@ impl Database {
         tracing::info!(
             bill_id,
             table = table_id,
+            payment = payment_method.as_str(),
             total = format_paise(summary.total_paise),
             "Bill committed to redb"
         );
@@ -262,6 +265,7 @@ impl Database {
             timestamp,
             items: items.to_vec(),
             summary: summary.clone(),
+            payment_method,
         };
 
         // Export physical receipt files
@@ -327,6 +331,10 @@ impl Database {
         buffer.push_str(&format!(
             "GRAND TOTAL:                                    {:>12}\n",
             format_paise(bill.summary.total_paise)
+        ));
+        buffer.push_str(&format!(
+            "Payment Mode:                                   {:>12}\n",
+            bill.payment_method.as_str()
         ));
         buffer.push_str("============================================================\n");
         buffer.push_str("                 Thank You! Visit Again!\n");
@@ -394,17 +402,23 @@ mod tests {
         ];
 
         let summary = BillSummary::calculate(&items);
-        let bill = db.save_bill("T1", &items, &summary).unwrap();
+        let bill = db
+            .save_bill("T1", &items, &summary, PaymentMethod::Upi)
+            .unwrap();
 
         assert_eq!(bill.id, 101);
         assert_eq!(bill.table_id, "T1");
         assert_eq!(bill.summary.subtotal_paise, 24000); // 18000 + 4*1500 = 24000
         assert_eq!(bill.items.len(), 2);
+        assert_eq!(bill.payment_method, PaymentMethod::Upi);
 
         // Second bill should have incremented ID
-        let bill2 = db.save_bill("T2", &items, &summary).unwrap();
+        let bill2 = db
+            .save_bill("T2", &items, &summary, PaymentMethod::Cash)
+            .unwrap();
         assert_eq!(bill2.id, 102);
         assert_eq!(bill2.table_id, "T2");
+        assert_eq!(bill2.payment_method, PaymentMethod::Cash);
 
         // Check receipt file creation
         let receipt_path = dir.path().join("receipt.txt");

@@ -99,6 +99,33 @@ impl TableStatus {
     }
 }
 
+/// Payment method used for settling a bill.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+pub enum PaymentMethod {
+    #[default]
+    Cash,
+    Upi,
+    Credit,
+}
+
+impl PaymentMethod {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            PaymentMethod::Cash => "Cash",
+            PaymentMethod::Upi => "UPI / Online",
+            PaymentMethod::Credit => "Khaata (Credit)",
+        }
+    }
+
+    pub fn short_code(&self) -> &'static str {
+        match self {
+            PaymentMethod::Cash => "CASH",
+            PaymentMethod::Upi => "UPI",
+            PaymentMethod::Credit => "KHAATA",
+        }
+    }
+}
+
 /// Active dining table with its cart and operational status.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TableOrder {
@@ -191,6 +218,8 @@ pub struct BillRecord {
     pub timestamp: String,
     pub items: Vec<CartItem>,
     pub summary: BillSummary,
+    #[serde(default)]
+    pub payment_method: PaymentMethod,
 }
 
 /// Formats integer paise into a standard Rupee string (`₹XX.YY`).

@@ -318,11 +318,12 @@
           <th>Table</th>
           <th>Time</th>
           <th>Items</th>
+          <th>Payment</th>
           <th>Total</th>
         </tr>
       </thead>
       <tbody id="bills-tbody">
-        <tr><td colspan="5" style="text-align:center; color:var(--text-dim);">No settled bills yet</td></tr>
+        <tr><td colspan="6" style="text-align:center; color:var(--text-dim);">No settled bills yet</td></tr>
       </tbody>
     </table>
   </div>
@@ -402,11 +403,12 @@
               <td>${escapeHtml(b.table_id)}</td>
               <td style="color:var(--text-dim);">${escapeHtml(b.timestamp)}</td>
               <td>${b.items_count} items</td>
+              <td><span style="display:inline-block; padding:2px 8px; border-radius:12px; font-size:0.75rem; font-weight:600; background:rgba(255,255,255,0.08);">${escapeHtml(b.payment_method || 'Cash')}</span></td>
               <td style="font-family:var(--font-mono); font-weight:bold; color:var(--accent-green);">${b.total_formatted}</td>
             </tr>
           `).join('');
         } else {
-          tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-dim); padding:16px;">No settled bills yet</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-dim); padding:16px;">No settled bills yet</td></tr>`;
         }
 
       } catch (err) {
