@@ -103,6 +103,7 @@ dhabatui
 | **`m`** | **Making Charges (*Banwai*)**: Add custom meat preparation |
 | **`e`** | **Alter Price**: Override unit price for active dish |
 | **`p`** | **Settle Bill**: Commit to `redb`, generate receipt, and clear table |
+| **`r`** / **`z`** | **Day-End Summary (Z-Report)**: Shift closure stats & cash reconciliation |
 | **`q`** / **`Esc`** | Exit DhabaTUI or close popup modal |
 
 ---
