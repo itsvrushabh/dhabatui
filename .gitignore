@@ -1,0 +1,6 @@
+target/
+*.redb
+*.log
+receipt.txt
+receipts/
+.DS_Store
