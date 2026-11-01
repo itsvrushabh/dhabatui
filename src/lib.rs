@@ -141,10 +141,33 @@ fn run_app<B: ratatui::backend::Backend>(
                         KeyCode::Char('p') | KeyCode::Char('P') => {
                             let _ = app.settle_and_print();
                         }
+                        KeyCode::Char('b') | KeyCode::Char('B') => {
+                            app.open_history();
+                        }
                         KeyCode::Char(c) if c.is_ascii_digit() => {
                             app.input_mode = InputMode::QuickCode;
                             app.quick_code_buffer.clear();
                             app.quick_code_buffer.push(c);
+                        }
+                        _ => {}
+                    },
+
+                    InputMode::ViewingHistory => match key.code {
+                        KeyCode::Down | KeyCode::Char('j') | KeyCode::Char('J') => {
+                            app.history_next();
+                        }
+                        KeyCode::Up | KeyCode::Char('k') | KeyCode::Char('K') => {
+                            app.history_previous();
+                        }
+                        KeyCode::Enter => {
+                            app.reprint_selected_bill();
+                        }
+                        KeyCode::Esc
+                        | KeyCode::Char('q')
+                        | KeyCode::Char('Q')
+                        | KeyCode::Char('b')
+                        | KeyCode::Char('B') => {
+                            app.close_history();
                         }
                         _ => {}
                     },
