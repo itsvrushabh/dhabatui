@@ -41,9 +41,32 @@ A lightning-fast, keyboard-driven Terminal User Interface (TUI) Point-of-Sale (P
 
 ---
 
+## 📦 Installation & Download
+
+### Option 1: Pre-Built Release Binaries (Recommended — No Rust Required)
+Download the ready-to-run binary package for your operating system from **[GitHub Releases](https://github.com/itsvrushabh/dhabatui/releases)**:
+
+| Platform | Download Package | Format | How to Run |
+| :--- | :--- | :--- | :--- |
+| 🐧 **Linux (x86_64)** | `dhabatui-v*-x86_64-unknown-linux-gnu.tar.gz` | `.tar.gz` archive | Extract and run `./dti` or `./dhabatui` |
+| 🪟 **Windows (x86_64)** | `dhabatui-v*-x86_64-pc-windows-msvc.zip` | `.zip` archive | Extract and double-click / run `dti.exe` |
+| 🍏 **macOS Apple Silicon (M1/M2/M3/M4)** | `dhabatui-v*-aarch64-apple-darwin.tar.gz` | `.tar.gz` archive | Extract and run `./dti` or `./dhabatui` |
+| 🍏 **macOS Intel (x86_64)** | `dhabatui-v*-x86_64-apple-darwin.tar.gz` | `.tar.gz` archive | Extract and run `./dti` or `./dhabatui` |
+
+*Every package contains both the full `dhabatui` binary and the fast `dti` alias.*
+
+### Option 2: Install via Cargo
+If you have the Rust toolchain installed on your POS machine, install directly with Cargo:
+```bash
+cargo install --git https://github.com/itsvrushabh/dhabatui.git
+```
+*(Automatically places `dti` and `dhabatui` into your `~/.cargo/bin/`).*
+
+---
+
 ## ⚡ Quick Start
 
-Run DhabaTUI directly from any terminal:
+Once downloaded or installed, launch DhabaTUI directly from any terminal:
 
 ```bash
 dti
