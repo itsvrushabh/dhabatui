@@ -4,7 +4,9 @@ use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Line, Span},
-    widgets::{Block, BorderType, Borders, Clear, HighlightSpacing, List, ListItem, Paragraph, Row, Table},
+    widgets::{
+        Block, BorderType, Borders, Clear, HighlightSpacing, List, ListItem, Paragraph, Row, Table,
+    },
     Frame,
 };
 
@@ -66,7 +68,9 @@ fn render_header(f: &mut Frame, app: &App, area: Rect) {
         .border_type(BorderType::Rounded)
         .border_style(Style::default().fg(Color::Yellow));
 
-    let paragraph = Paragraph::new(title_line).block(block).alignment(Alignment::Left);
+    let paragraph = Paragraph::new(title_line)
+        .block(block)
+        .alignment(Alignment::Left);
     f.render_widget(paragraph, area);
 }
 
@@ -106,7 +110,9 @@ fn render_menu(f: &mut Frame, app: &mut App, area: Rect) {
             let line = Line::from(vec![
                 Span::styled(
                     format!("[{:>3}] ", item.code),
-                    Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD),
+                    Style::default()
+                        .fg(Color::Yellow)
+                        .add_modifier(Modifier::BOLD),
                 ),
                 Span::styled(
                     format!("{:<26}", item.name),
@@ -118,7 +124,9 @@ fn render_menu(f: &mut Frame, app: &mut App, area: Rect) {
                 ),
                 Span::styled(
                     format!("{:>9}", format_paise(item.price_paise)),
-                    Style::default().fg(Color::Green).add_modifier(Modifier::BOLD),
+                    Style::default()
+                        .fg(Color::Green)
+                        .add_modifier(Modifier::BOLD),
                 ),
             ]);
             ListItem::new(line)
@@ -140,7 +148,11 @@ fn render_menu(f: &mut Frame, app: &mut App, area: Rect) {
                 .title(Span::styled(
                     title,
                     Style::default()
-                        .fg(if is_focused { Color::Cyan } else { Color::White })
+                        .fg(if is_focused {
+                            Color::Cyan
+                        } else {
+                            Color::White
+                        })
                         .add_modifier(Modifier::BOLD),
                 )),
         )
@@ -196,17 +208,25 @@ fn render_cart(f: &mut Frame, app: &mut App, area: Rect) {
         .iter()
         .map(|item| {
             let name_span = if item.is_custom {
-                Span::styled(format!("* {}", item.name), Style::default().fg(Color::Magenta))
+                Span::styled(
+                    format!("* {}", item.name),
+                    Style::default().fg(Color::Magenta),
+                )
             } else {
                 Span::styled(item.name.clone(), Style::default().fg(Color::White))
             };
 
             Row::new(vec![
-                Span::styled(format!("[{}]", item.code), Style::default().fg(Color::DarkGray)),
+                Span::styled(
+                    format!("[{}]", item.code),
+                    Style::default().fg(Color::DarkGray),
+                ),
                 name_span,
                 Span::styled(
                     format!("{:>3}", item.quantity),
-                    Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD),
+                    Style::default()
+                        .fg(Color::Cyan)
+                        .add_modifier(Modifier::BOLD),
                 ),
                 Span::styled(
                     format!("{:>10}", format_paise(item.price_paise)),
@@ -214,7 +234,9 @@ fn render_cart(f: &mut Frame, app: &mut App, area: Rect) {
                 ),
                 Span::styled(
                     format!("{:>10}", format_paise(item.line_total_paise())),
-                    Style::default().fg(Color::Green).add_modifier(Modifier::BOLD),
+                    Style::default()
+                        .fg(Color::Green)
+                        .add_modifier(Modifier::BOLD),
                 ),
             ])
         })
@@ -244,7 +266,11 @@ fn render_cart(f: &mut Frame, app: &mut App, area: Rect) {
                 .title(Span::styled(
                     title,
                     Style::default()
-                        .fg(if is_focused { Color::Cyan } else { Color::White })
+                        .fg(if is_focused {
+                            Color::Cyan
+                        } else {
+                            Color::White
+                        })
                         .add_modifier(Modifier::BOLD),
                 )),
         )
@@ -260,7 +286,10 @@ fn render_cart(f: &mut Frame, app: &mut App, area: Rect) {
 }
 
 fn cell_styled<'a>(text: &'a str, color: Color) -> Span<'a> {
-    Span::styled(text, Style::default().fg(color).add_modifier(Modifier::BOLD))
+    Span::styled(
+        text,
+        Style::default().fg(color).add_modifier(Modifier::BOLD),
+    )
 }
 
 fn render_summary(f: &mut Frame, app: &App, area: Rect) {
@@ -271,13 +300,17 @@ fn render_summary(f: &mut Frame, app: &App, area: Rect) {
             Span::styled(" Total Items: ", Style::default().fg(Color::DarkGray)),
             Span::styled(
                 format!("{} ({} lines)", summary.total_items, summary.total_lines),
-                Style::default().fg(Color::White).add_modifier(Modifier::BOLD),
+                Style::default()
+                    .fg(Color::White)
+                    .add_modifier(Modifier::BOLD),
             ),
             Span::raw("   |   "),
             Span::styled("Subtotal: ", Style::default().fg(Color::DarkGray)),
             Span::styled(
                 format!("{:>12}", format_paise(summary.subtotal_paise)),
-                Style::default().fg(Color::White).add_modifier(Modifier::BOLD),
+                Style::default()
+                    .fg(Color::White)
+                    .add_modifier(Modifier::BOLD),
             ),
         ]),
         Line::from(vec![
@@ -316,7 +349,9 @@ fn render_summary(f: &mut Frame, app: &App, area: Rect) {
         .border_style(Style::default().fg(Color::DarkGray))
         .title(Span::styled(
             " Bill & Tax Summary (5% GST) ",
-            Style::default().fg(Color::White).add_modifier(Modifier::BOLD),
+            Style::default()
+                .fg(Color::White)
+                .add_modifier(Modifier::BOLD),
         ));
 
     let paragraph = Paragraph::new(summary_lines)
@@ -352,23 +387,64 @@ fn render_status_bar(f: &mut Frame, app: &App, area: Rect) {
 
 fn render_footer(f: &mut Frame, _app: &App, area: Rect) {
     let keys = vec![
-        Span::styled("Tab", Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD)),
+        Span::styled(
+            "Tab",
+            Style::default()
+                .fg(Color::Yellow)
+                .add_modifier(Modifier::BOLD),
+        ),
         Span::raw(":Pane | "),
-        Span::styled("Enter", Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD)),
+        Span::styled(
+            "Enter",
+            Style::default()
+                .fg(Color::Yellow)
+                .add_modifier(Modifier::BOLD),
+        ),
         Span::raw(":Add | "),
-        Span::styled("+/-", Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD)),
+        Span::styled(
+            "+/-",
+            Style::default()
+                .fg(Color::Yellow)
+                .add_modifier(Modifier::BOLD),
+        ),
         Span::raw(":Qty | "),
-        Span::styled("e", Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD)),
+        Span::styled(
+            "e",
+            Style::default()
+                .fg(Color::Cyan)
+                .add_modifier(Modifier::BOLD),
+        ),
         Span::raw(":Edit Price | "),
-        Span::styled("m", Style::default().fg(Color::Magenta).add_modifier(Modifier::BOLD)),
+        Span::styled(
+            "m",
+            Style::default()
+                .fg(Color::Magenta)
+                .add_modifier(Modifier::BOLD),
+        ),
         Span::raw(":Making Chg | "),
-        Span::styled("d", Style::default().fg(Color::Red).add_modifier(Modifier::BOLD)),
+        Span::styled(
+            "d",
+            Style::default().fg(Color::Red).add_modifier(Modifier::BOLD),
+        ),
         Span::raw(":Del | "),
-        Span::styled("c", Style::default().fg(Color::Red).add_modifier(Modifier::BOLD)),
+        Span::styled(
+            "c",
+            Style::default().fg(Color::Red).add_modifier(Modifier::BOLD),
+        ),
         Span::raw(":Clear | "),
-        Span::styled("p", Style::default().fg(Color::Green).add_modifier(Modifier::BOLD)),
+        Span::styled(
+            "p",
+            Style::default()
+                .fg(Color::Green)
+                .add_modifier(Modifier::BOLD),
+        ),
         Span::raw(":Settle & Print | "),
-        Span::styled("q", Style::default().fg(Color::White).add_modifier(Modifier::BOLD)),
+        Span::styled(
+            "q",
+            Style::default()
+                .fg(Color::White)
+                .add_modifier(Modifier::BOLD),
+        ),
         Span::raw(":Quit"),
     ];
 
@@ -412,7 +488,12 @@ fn render_edit_price_modal(f: &mut Frame, app: &App) {
     let text = vec![
         Line::from(vec![
             Span::styled("Item: ", Style::default().fg(Color::DarkGray)),
-            Span::styled(item_name, Style::default().fg(Color::White).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                item_name,
+                Style::default()
+                    .fg(Color::White)
+                    .add_modifier(Modifier::BOLD),
+            ),
         ]),
         Line::from(""),
         Line::from(vec![
@@ -427,9 +508,17 @@ fn render_edit_price_modal(f: &mut Frame, app: &App) {
         ]),
         Line::from(""),
         Line::from(vec![
-            Span::styled("[Enter]", Style::default().fg(Color::Green).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[Enter]",
+                Style::default()
+                    .fg(Color::Green)
+                    .add_modifier(Modifier::BOLD),
+            ),
             Span::raw(" Commit   "),
-            Span::styled("[Esc]", Style::default().fg(Color::Red).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[Esc]",
+                Style::default().fg(Color::Red).add_modifier(Modifier::BOLD),
+            ),
             Span::raw(" Cancel"),
         ]),
     ];
@@ -440,10 +529,14 @@ fn render_edit_price_modal(f: &mut Frame, app: &App) {
         .border_style(Style::default().fg(Color::Cyan))
         .title(Span::styled(
             " Alter Unit Price on the Go ",
-            Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD),
+            Style::default()
+                .fg(Color::Cyan)
+                .add_modifier(Modifier::BOLD),
         ));
 
-    let paragraph = Paragraph::new(text).block(block).alignment(Alignment::Center);
+    let paragraph = Paragraph::new(text)
+        .block(block)
+        .alignment(Alignment::Center);
     f.render_widget(paragraph, area);
 }
 
@@ -454,7 +547,9 @@ fn render_custom_name_modal(f: &mut Frame, app: &App) {
     let text = vec![
         Line::from(Span::styled(
             "Customer-Supplied Meat / Special Cooking (Step 1 of 2)",
-            Style::default().fg(Color::Magenta).add_modifier(Modifier::BOLD),
+            Style::default()
+                .fg(Color::Magenta)
+                .add_modifier(Modifier::BOLD),
         )),
         Line::from(""),
         Line::from(vec![
@@ -473,9 +568,17 @@ fn render_custom_name_modal(f: &mut Frame, app: &App) {
         )),
         Line::from(""),
         Line::from(vec![
-            Span::styled("[Enter]", Style::default().fg(Color::Green).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[Enter]",
+                Style::default()
+                    .fg(Color::Green)
+                    .add_modifier(Modifier::BOLD),
+            ),
             Span::raw(" Next (Set Price)   "),
-            Span::styled("[Esc]", Style::default().fg(Color::Red).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[Esc]",
+                Style::default().fg(Color::Red).add_modifier(Modifier::BOLD),
+            ),
             Span::raw(" Cancel"),
         ]),
     ];
@@ -486,10 +589,14 @@ fn render_custom_name_modal(f: &mut Frame, app: &App) {
         .border_style(Style::default().fg(Color::Magenta))
         .title(Span::styled(
             " Add Custom / Making Charge ",
-            Style::default().fg(Color::Magenta).add_modifier(Modifier::BOLD),
+            Style::default()
+                .fg(Color::Magenta)
+                .add_modifier(Modifier::BOLD),
         ));
 
-    let paragraph = Paragraph::new(text).block(block).alignment(Alignment::Center);
+    let paragraph = Paragraph::new(text)
+        .block(block)
+        .alignment(Alignment::Center);
     f.render_widget(paragraph, area);
 }
 
@@ -502,12 +609,17 @@ fn render_custom_price_modal(f: &mut Frame, app: &App) {
             Span::styled("Item: ", Style::default().fg(Color::DarkGray)),
             Span::styled(
                 &app.pending_custom_name,
-                Style::default().fg(Color::Magenta).add_modifier(Modifier::BOLD),
+                Style::default()
+                    .fg(Color::Magenta)
+                    .add_modifier(Modifier::BOLD),
             ),
         ]),
         Line::from(""),
         Line::from(vec![
-            Span::styled("Cooking / Making Charge (₹): ", Style::default().fg(Color::Yellow)),
+            Span::styled(
+                "Cooking / Making Charge (₹): ",
+                Style::default().fg(Color::Yellow),
+            ),
             Span::styled(
                 format!("{}_", app.input_buffer),
                 Style::default()
@@ -518,9 +630,17 @@ fn render_custom_price_modal(f: &mut Frame, app: &App) {
         ]),
         Line::from(""),
         Line::from(vec![
-            Span::styled("[Enter]", Style::default().fg(Color::Green).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[Enter]",
+                Style::default()
+                    .fg(Color::Green)
+                    .add_modifier(Modifier::BOLD),
+            ),
             Span::raw(" Add to Order   "),
-            Span::styled("[Esc]", Style::default().fg(Color::Red).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[Esc]",
+                Style::default().fg(Color::Red).add_modifier(Modifier::BOLD),
+            ),
             Span::raw(" Cancel"),
         ]),
     ];
@@ -531,9 +651,13 @@ fn render_custom_price_modal(f: &mut Frame, app: &App) {
         .border_style(Style::default().fg(Color::Magenta))
         .title(Span::styled(
             " Set Making Price (Step 2 of 2) ",
-            Style::default().fg(Color::Magenta).add_modifier(Modifier::BOLD),
+            Style::default()
+                .fg(Color::Magenta)
+                .add_modifier(Modifier::BOLD),
         ));
 
-    let paragraph = Paragraph::new(text).block(block).alignment(Alignment::Center);
+    let paragraph = Paragraph::new(text)
+        .block(block)
+        .alignment(Alignment::Center);
     f.render_widget(paragraph, area);
 }

@@ -198,7 +198,11 @@ impl Database {
     }
 
     /// Atomically records a finalized bill into `redb` and exports a receipt file.
-    pub fn save_bill(&self, items: &[CartItem], summary: &BillSummary) -> Result<BillRecord, DbError> {
+    pub fn save_bill(
+        &self,
+        items: &[CartItem],
+        summary: &BillSummary,
+    ) -> Result<BillRecord, DbError> {
         let write_txn = self.db.begin_write()?;
         let bill_id;
         let timestamp = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
@@ -226,7 +230,11 @@ impl Database {
         }
 
         write_txn.commit()?;
-        tracing::info!(bill_id, total = format_paise(summary.total_paise), "Bill committed to redb");
+        tracing::info!(
+            bill_id,
+            total = format_paise(summary.total_paise),
+            "Bill committed to redb"
+        );
 
         let record = BillRecord {
             id: bill_id,
@@ -333,8 +341,12 @@ mod tests {
 
         let menu = db.get_menu().unwrap();
         assert!(!menu.is_empty());
-        assert!(menu.iter().any(|m| m.code == "101" && m.name == "Dal Tadka"));
-        assert!(menu.iter().any(|m| m.code == "401" && m.name.contains("Mutton Making")));
+        assert!(menu
+            .iter()
+            .any(|m| m.code == "101" && m.name == "Dal Tadka"));
+        assert!(menu
+            .iter()
+            .any(|m| m.code == "401" && m.name.contains("Mutton Making")));
     }
 
     #[test]

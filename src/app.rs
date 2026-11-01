@@ -186,7 +186,12 @@ impl App {
 
     pub fn add_item_by_code(&mut self, code: &str) -> bool {
         let trimmed = code.trim();
-        if let Some(item) = self.menu.iter().find(|m| m.code.eq_ignore_ascii_case(trimmed)).cloned() {
+        if let Some(item) = self
+            .menu
+            .iter()
+            .find(|m| m.code.eq_ignore_ascii_case(trimmed))
+            .cloned()
+        {
             self.add_or_increment_menu_item(&item);
             true
         } else {
@@ -230,7 +235,10 @@ impl App {
             if i < self.cart.len() {
                 self.cart[i].quantity = self.cart[i].quantity.saturating_add(1);
                 self.set_toast(
-                    format!("Qty increased for '{}' to {}", self.cart[i].name, self.cart[i].quantity),
+                    format!(
+                        "Qty increased for '{}' to {}",
+                        self.cart[i].name, self.cart[i].quantity
+                    ),
                     ToastType::Success,
                 );
             }
@@ -243,12 +251,18 @@ impl App {
                 if self.cart[i].quantity > 1 {
                     self.cart[i].quantity -= 1;
                     self.set_toast(
-                        format!("Qty decreased for '{}' to {}", self.cart[i].name, self.cart[i].quantity),
+                        format!(
+                            "Qty decreased for '{}' to {}",
+                            self.cart[i].name, self.cart[i].quantity
+                        ),
                         ToastType::Info,
                     );
                 } else {
                     let removed = self.cart.remove(i);
-                    self.set_toast(format!("Removed '{}' from cart", removed.name), ToastType::Info);
+                    self.set_toast(
+                        format!("Removed '{}' from cart", removed.name),
+                        ToastType::Info,
+                    );
                     if self.cart.is_empty() {
                         self.cart_state.select(None);
                         self.active_pane = ActivePane::Menu;
@@ -350,7 +364,11 @@ impl App {
                 self.cart_state.select(Some(pos));
                 self.active_pane = ActivePane::Cart;
                 self.set_toast(
-                    format!("Added custom item '{}' ({})", name, format_paise(price_paise)),
+                    format!(
+                        "Added custom item '{}' ({})",
+                        name,
+                        format_paise(price_paise)
+                    ),
                     ToastType::Success,
                 );
                 self.input_buffer.clear();
@@ -366,7 +384,10 @@ impl App {
 
     pub fn settle_and_print(&mut self) -> Result<Option<BillRecord>, DbError> {
         if self.cart.is_empty() {
-            self.set_toast("Cart is empty! Add items before checkout.", ToastType::Error);
+            self.set_toast(
+                "Cart is empty! Add items before checkout.",
+                ToastType::Error,
+            );
             return Ok(None);
         }
 
