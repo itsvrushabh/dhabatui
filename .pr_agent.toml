@@ -1,0 +1,29 @@
+[config]
+publish_output = true
+
+[github_action_config]
+auto_review = true
+auto_describe = true
+auto_improve = false
+pr_actions = ["opened", "reopened", "ready_for_review", "synchronize"]
+
+[pr_reviewer]
+num_code_suggestions = 4
+inline_code_comments = true
+ask_and_reflect = true
+require_score_review = true
+require_tests_review = true
+extra_instructions = """
+Focus on Rust idioms, concurrency safety, terminal UI resilience, network security (LAN validation), and Redb transactional safety.
+"""
+
+[pr_describe]
+publish_labels = true
+add_original_user_description = true
+
+[pr_code_suggestions]
+num_code_suggestions = 4
+extra_instructions = "Prefer idiomatic Rust and zero-cost abstractions."
+
+[pr_questions]
+use_conversation_history = true
