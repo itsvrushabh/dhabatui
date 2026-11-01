@@ -41,9 +41,11 @@ A lightning-fast, keyboard-driven Terminal User Interface (TUI) Point-of-Sale (P
 DhabaTUI is engineered so the cashier never needs to take their hands off the keyboard.
 
 ### 1. Launching the Counter
-Start DhabaTUI from any terminal:
+Start DhabaTUI from any terminal by typing:
 ```bash
-cargo run --release
+dhabatui
+# or simply
+dti
 ```
 The application opens in an alternate screen without altering your shell history.
 
