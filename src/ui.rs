@@ -1,5 +1,5 @@
 use crate::app::{ActivePane, App, InputMode, ToastType};
-use crate::models::{format_paise, TableStatus};
+use crate::models::{format_paise, format_paise_u64, TableStatus};
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
@@ -30,6 +30,7 @@ pub fn render(f: &mut Frame, app: &mut App) {
 
     // Render interactive modal if in input mode
     match app.input_mode {
+        InputMode::ViewingDailyReport => render_daily_report_modal(f, app),
         InputMode::EditingPrice => render_edit_price_modal(f, app),
         InputMode::AddingCustomName => render_custom_name_modal(f, app),
         InputMode::AddingCustomPrice => render_custom_price_modal(f, app),
@@ -511,6 +512,13 @@ fn render_footer(f: &mut Frame, _app: &App, area: Rect) {
         ),
         Span::raw(":Settle | "),
         Span::styled(
+            "r",
+            Style::default()
+                .fg(Color::Yellow)
+                .add_modifier(Modifier::BOLD),
+        ),
+        Span::raw(":Report | "),
+        Span::styled(
             "q",
             Style::default()
                 .fg(Color::White)
@@ -730,5 +738,158 @@ fn render_custom_price_modal(f: &mut Frame, app: &App) {
     let paragraph = Paragraph::new(text)
         .block(block)
         .alignment(Alignment::Center);
+    f.render_widget(paragraph, area);
+}
+
+fn render_daily_report_modal(f: &mut Frame, app: &App) {
+    let area = centered_rect(65, 75, f.area());
+    f.render_widget(Clear, area);
+
+    let report = match &app.daily_report {
+        Some(r) => r,
+        None => return,
+    };
+
+    let mut lines = vec![
+        Line::from(vec![
+            Span::styled("Date: ", Style::default().fg(Color::DarkGray)),
+            Span::styled(
+                &report.date,
+                Style::default()
+                    .fg(Color::Cyan)
+                    .add_modifier(Modifier::BOLD),
+            ),
+            Span::raw("    "),
+            Span::styled("Total Invoices: ", Style::default().fg(Color::DarkGray)),
+            Span::styled(
+                report.total_bills.to_string(),
+                Style::default()
+                    .fg(Color::Yellow)
+                    .add_modifier(Modifier::BOLD),
+            ),
+            Span::raw("    "),
+            Span::styled("Items Prepared: ", Style::default().fg(Color::DarkGray)),
+            Span::styled(
+                report.total_items_sold.to_string(),
+                Style::default()
+                    .fg(Color::Yellow)
+                    .add_modifier(Modifier::BOLD),
+            ),
+        ]),
+        Line::from("─".repeat(58)),
+        Line::from(vec![
+            Span::styled("Dine-In Revenue:   ", Style::default().fg(Color::White)),
+            Span::styled(
+                format!(
+                    "{} ({} bills)",
+                    format_paise_u64(report.dine_in_total_paise),
+                    report.dine_in_bills
+                ),
+                Style::default().fg(Color::Cyan),
+            ),
+        ]),
+        Line::from(vec![
+            Span::styled("Parcel / Takeaway: ", Style::default().fg(Color::White)),
+            Span::styled(
+                format!(
+                    "{} ({} bills)",
+                    format_paise_u64(report.parcel_total_paise),
+                    report.parcel_bills
+                ),
+                Style::default().fg(Color::Cyan),
+            ),
+        ]),
+        Line::from("─".repeat(58)),
+        Line::from(vec![
+            Span::styled("Gross Subtotal:    ", Style::default().fg(Color::DarkGray)),
+            Span::styled(
+                format_paise_u64(report.subtotal_paise),
+                Style::default().fg(Color::White),
+            ),
+        ]),
+        Line::from(vec![
+            Span::styled("CGST (2.5%):       ", Style::default().fg(Color::DarkGray)),
+            Span::styled(
+                format_paise_u64(report.cgst_paise),
+                Style::default().fg(Color::DarkGray),
+            ),
+        ]),
+        Line::from(vec![
+            Span::styled("SGST (2.5%):       ", Style::default().fg(Color::DarkGray)),
+            Span::styled(
+                format_paise_u64(report.sgst_paise),
+                Style::default().fg(Color::DarkGray),
+            ),
+        ]),
+        Line::from(vec![
+            Span::styled(
+                "GRAND TOTAL:       ",
+                Style::default()
+                    .fg(Color::Green)
+                    .add_modifier(Modifier::BOLD),
+            ),
+            Span::styled(
+                format_paise_u64(report.grand_total_paise),
+                Style::default()
+                    .fg(Color::Green)
+                    .add_modifier(Modifier::BOLD),
+            ),
+        ]),
+        Line::from("═".repeat(58)),
+        Line::from(Span::styled(
+            "TOP SELLING DISHES:",
+            Style::default()
+                .fg(Color::Yellow)
+                .add_modifier(Modifier::BOLD),
+        )),
+    ];
+
+    if report.top_items.is_empty() {
+        lines.push(Line::from(Span::styled(
+            "  No settled dish orders for today yet.",
+            Style::default().fg(Color::DarkGray),
+        )));
+    } else {
+        for (name, qty, total) in report.top_items.iter().take(6) {
+            lines.push(Line::from(vec![
+                Span::styled(
+                    format!(
+                        "  • {:<26}",
+                        if name.len() > 26 { &name[..26] } else { name }
+                    ),
+                    Style::default().fg(Color::White),
+                ),
+                Span::styled(format!("x{:<4}", qty), Style::default().fg(Color::Yellow)),
+                Span::styled(format_paise_u64(*total), Style::default().fg(Color::Green)),
+            ]));
+        }
+    }
+
+    lines.push(Line::from(""));
+    lines.push(Line::from(vec![
+        Span::styled(
+            "[Esc] / [r] ",
+            Style::default()
+                .fg(Color::Yellow)
+                .add_modifier(Modifier::BOLD),
+        ),
+        Span::raw("Close Modal  •  Slip exported to "),
+        Span::styled("daily_report.txt", Style::default().fg(Color::Cyan)),
+    ]));
+
+    let block = Block::default()
+        .borders(Borders::ALL)
+        .border_type(BorderType::Double)
+        .border_style(Style::default().fg(Color::Yellow))
+        .title(Span::styled(
+            " 📊 Day-End Sales Closure / Z-Report ",
+            Style::default()
+                .fg(Color::Yellow)
+                .add_modifier(Modifier::BOLD),
+        ));
+
+    let paragraph = Paragraph::new(lines)
+        .block(block)
+        .alignment(Alignment::Left);
     f.render_widget(paragraph, area);
 }

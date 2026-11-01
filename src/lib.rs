@@ -141,10 +141,30 @@ fn run_app<B: ratatui::backend::Backend>(
                         KeyCode::Char('p') | KeyCode::Char('P') => {
                             let _ = app.settle_and_print();
                         }
+                        KeyCode::Char('r')
+                        | KeyCode::Char('R')
+                        | KeyCode::Char('z')
+                        | KeyCode::Char('Z') => {
+                            app.show_daily_report();
+                        }
                         KeyCode::Char(c) if c.is_ascii_digit() => {
                             app.input_mode = InputMode::QuickCode;
                             app.quick_code_buffer.clear();
                             app.quick_code_buffer.push(c);
+                        }
+                        _ => {}
+                    },
+
+                    InputMode::ViewingDailyReport => match key.code {
+                        KeyCode::Esc
+                        | KeyCode::Enter
+                        | KeyCode::Char('q')
+                        | KeyCode::Char('Q')
+                        | KeyCode::Char('r')
+                        | KeyCode::Char('R')
+                        | KeyCode::Char('z')
+                        | KeyCode::Char('Z') => {
+                            app.close_daily_report();
                         }
                         _ => {}
                     },
