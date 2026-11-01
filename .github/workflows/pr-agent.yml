@@ -11,11 +11,11 @@ jobs:
     if: ${{ github.event.sender.type != 'Bot' }}
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       issues: write
       pull-requests: write
 
-    name: Run PR Agent Review
+    name: Run PR Agent (/describe, /review, /improve)
     steps:
       - name: PR Agent action step
         id: pragent
@@ -25,3 +25,6 @@ jobs:
           OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
           GEMINI_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GEMINI_KEY }}
           GOOGLE_AI_STUDIO.GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GEMINI_KEY }}
+          github_action_config.auto_describe: "true"
+          github_action_config.auto_review: "true"
+          github_action_config.auto_improve: "true"
