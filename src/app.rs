@@ -1,3 +1,4 @@
+use crate::config::AppConfig;
 use crate::db::{Database, DbError};
 use crate::models::{
     format_paise, parse_rupees_to_paise, BillRecord, CartItem, MenuItem, TableOrder, TableStatus,
@@ -45,10 +46,15 @@ pub struct App {
     pub should_quit: bool,
     pub web_handle: Option<WebServerHandle>,
     pub recent_bills: Vec<BillRecord>,
+    pub config: AppConfig,
 }
 
 impl App {
     pub fn new(db: Database) -> Result<Self, DbError> {
+        Self::with_config(db, AppConfig::load())
+    }
+
+    pub fn with_config(db: Database, config: AppConfig) -> Result<Self, DbError> {
         let menu = db.get_menu()?;
         let mut menu_state = ListState::default();
         if !menu.is_empty() {
@@ -58,17 +64,18 @@ impl App {
         let mut cart_state = TableState::default();
         cart_state.select(None);
 
-        let tables = vec![
-            TableOrder::new("T1", "Table 1"),
-            TableOrder::new("T2", "Table 2"),
-            TableOrder::new("T3", "Table 3"),
-            TableOrder::new("T4", "Table 4"),
-            TableOrder::new("T5", "Table 5"),
-            TableOrder::new("T6", "Table 6"),
-            TableOrder::new("T7", "Table 7"),
-            TableOrder::new("T8", "Table 8"),
-            TableOrder::new("Parcel", "Parcel / Takeaway"),
-        ];
+        let mut tables = Vec::new();
+        if !config.tables.custom_labels.is_empty() {
+            for (idx, label) in config.tables.custom_labels.iter().enumerate() {
+                tables.push(TableOrder::new(format!("T{}", idx + 1), label));
+            }
+        } else {
+            let count = config.tables.count.max(1);
+            for i in 1..=count {
+                tables.push(TableOrder::new(format!("T{i}"), format!("Table {i}")));
+            }
+        }
+        tables.push(TableOrder::new("Parcel", "Parcel / Takeaway"));
 
         let recent_bills = db.get_recent_bills(10).unwrap_or_default();
 
@@ -92,19 +99,22 @@ impl App {
             should_quit: false,
             web_handle: None,
             recent_bills,
+            config: config.clone(),
         };
 
-        // Start LAN web server
-        let initial_data = DashboardData::build(&app.tables, &app.recent_bills, "Detecting...");
-        match crate::web::start_lan_server(initial_data) {
-            Ok(handle) => {
-                let url = handle.lan_url.clone();
-                app.web_handle = Some(handle);
-                app.sync_web_dashboard();
-                app.set_toast(format!("Live LAN Web Dashboard: {url}"), ToastType::Info);
-            }
-            Err(err) => {
-                tracing::error!(%err, "Could not start LAN web server");
+        // Start LAN web server if enabled
+        if config.web.enabled {
+            let initial_data = DashboardData::build(&app.tables, &app.recent_bills, "Detecting...");
+            match crate::web::start_lan_server(initial_data) {
+                Ok(handle) => {
+                    let url = handle.lan_url.clone();
+                    app.web_handle = Some(handle);
+                    app.sync_web_dashboard();
+                    app.set_toast(format!("Live LAN Web Dashboard: {url}"), ToastType::Info);
+                }
+                Err(err) => {
+                    tracing::error!(%err, "Could not start LAN web server");
+                }
             }
         }
 
@@ -553,7 +563,11 @@ impl App {
             return Ok(None);
         }
 
-        let summary = table.summary();
+        let summary = table.summary_with_tax(
+            self.config.tax.enable_gst,
+            self.config.tax.cgst_rate_permille,
+            self.config.tax.sgst_rate_permille,
+        );
         let table_id = table.id.clone();
         let table_label = table.label.clone();
 
@@ -569,6 +583,15 @@ impl App {
                 // Add to recent bills history
                 self.recent_bills.insert(0, record.clone());
                 self.recent_bills.truncate(10);
+
+                let _ = self.db.export_receipt_with_profile(
+                    &record,
+                    &self.config.dhaba.name,
+                    &self.config.dhaba.address,
+                    &self.config.dhaba.phone,
+                    &self.config.dhaba.gstin,
+                    &self.config.dhaba.tagline,
+                );
 
                 // Reset table
                 let table = &mut self.tables[self.active_table_idx];
@@ -695,5 +718,36 @@ mod tests {
         assert_eq!(bill.summary.total_paise, 46200);
         assert!(app.active_table().items.is_empty());
         assert_eq!(app.active_table().status, TableStatus::Vacant);
+    }
+
+    #[test]
+    fn test_custom_config_app() {
+        let dir = tempdir().unwrap().keep();
+        let db_path = dir.join("app_cfg_test.redb");
+        let db = Database::open(&db_path).unwrap();
+
+        let mut cfg = AppConfig::default();
+        cfg.dhaba.name = "PIND BALLUCHI".to_string();
+        cfg.tax.enable_gst = false; // Zero tax mode
+        cfg.tables.count = 4;
+        cfg.tables.custom_labels = vec![
+            "Khat 1".to_string(),
+            "Khat 2".to_string(),
+            "Garden 1".to_string(),
+        ];
+
+        let mut app = App::with_config(db, cfg).unwrap();
+        assert_eq!(app.config.dhaba.name, "PIND BALLUCHI");
+        // 3 custom tables + 1 Parcel = 4
+        assert_eq!(app.tables.len(), 4);
+        assert_eq!(app.tables[0].label, "Khat 1");
+        assert_eq!(app.tables[2].label, "Garden 1");
+
+        // Test zero-tax calculation
+        assert!(app.add_item_by_code("101"));
+        let bill = app.settle_and_print().unwrap().unwrap();
+        assert_eq!(bill.summary.cgst_paise, 0);
+        assert_eq!(bill.summary.sgst_paise, 0);
+        assert_eq!(bill.summary.total_paise, bill.summary.subtotal_paise);
     }
 }

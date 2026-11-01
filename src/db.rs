@@ -275,9 +275,35 @@ impl Database {
     /// Exports an itemized text receipt to `receipt.txt` (latest)
     /// and archives a copy to `receipts/bill_{id}.txt`.
     pub fn export_receipt(&self, bill: &BillRecord) -> Result<String, std::io::Error> {
+        self.export_receipt_with_profile(
+            bill,
+            "DHABA TUI",
+            "National Highway Eatery",
+            "+91 98765 43210",
+            "27AAAAA0000A1Z5",
+            "Thank You! Visit Again!",
+        )
+    }
+
+    /// Exports an itemized text receipt using custom dhaba profile details.
+    pub fn export_receipt_with_profile(
+        &self,
+        bill: &BillRecord,
+        name: &str,
+        address: &str,
+        phone: &str,
+        gstin: &str,
+        tagline: &str,
+    ) -> Result<String, std::io::Error> {
         let mut buffer = String::new();
         buffer.push_str("============================================================\n");
-        buffer.push_str("                      DHABA TUI BILL\n");
+        let centered_name = format!("{:^60}\n", name);
+        buffer.push_str(&centered_name);
+        buffer.push_str(&format!("{:^60}\n", address));
+        buffer.push_str(&format!(
+            "{:^60}\n",
+            format!("Tel: {phone} • GSTIN: {gstin}")
+        ));
         buffer.push_str("============================================================\n");
         buffer.push_str(&format!(
             "Bill No: #{:<16} Table: {:<8} Date: {}\n",
@@ -316,11 +342,11 @@ impl Database {
             format_paise(bill.summary.subtotal_paise)
         ));
         buffer.push_str(&format!(
-            "CGST (2.5%):                                    {:>12}\n",
+            "CGST:                                           {:>12}\n",
             format_paise(bill.summary.cgst_paise)
         ));
         buffer.push_str(&format!(
-            "SGST (2.5%):                                    {:>12}\n",
+            "SGST:                                           {:>12}\n",
             format_paise(bill.summary.sgst_paise)
         ));
         buffer.push_str("------------------------------------------------------------\n");
@@ -329,7 +355,7 @@ impl Database {
             format_paise(bill.summary.total_paise)
         ));
         buffer.push_str("============================================================\n");
-        buffer.push_str("                 Thank You! Visit Again!\n");
+        buffer.push_str(&format!("{:^60}\n", tagline));
         buffer.push_str("============================================================\n");
 
         // Write to latest receipt.txt
