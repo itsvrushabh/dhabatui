@@ -348,6 +348,73 @@ impl Database {
         tracing::info!(path = %latest_path.display(), "Exported latest receipt");
         Ok(buffer)
     }
+
+    /// Exports an itemized text receipt marked as a duplicate to `receipt.txt`.
+    pub fn export_duplicate_receipt(&self, bill: &BillRecord) -> Result<String, std::io::Error> {
+        let mut buffer = String::new();
+        buffer.push_str("============================================================\n");
+        buffer.push_str("          DHABA TUI BILL — *** DUPLICATE RECEIPT ***        \n");
+        buffer.push_str("============================================================\n");
+        buffer.push_str(&format!(
+            "Bill No: #{:<16} Table: {:<8} Date: {}\n",
+            bill.id, bill.table_id, bill.timestamp
+        ));
+        buffer.push_str("------------------------------------------------------------\n");
+        buffer.push_str("Item                            Qty    Price        Total\n");
+        buffer.push_str("------------------------------------------------------------\n");
+
+        for item in &bill.items {
+            let item_display = if item.is_custom {
+                format!("* {}", item.name)
+            } else {
+                item.name.clone()
+            };
+            buffer.push_str(&format!(
+                "{:<30} {:>3} {:>8} {:>12}\n",
+                if item_display.len() > 30 {
+                    &item_display[..30]
+                } else {
+                    &item_display
+                },
+                item.quantity,
+                format_paise(item.price_paise),
+                format_paise(item.line_total_paise())
+            ));
+        }
+
+        buffer.push_str("------------------------------------------------------------\n");
+        buffer.push_str(&format!(
+            "Total Items: {} ({} lines)\n",
+            bill.summary.total_items, bill.summary.total_lines
+        ));
+        buffer.push_str(&format!(
+            "Subtotal:                                       {:>12}\n",
+            format_paise(bill.summary.subtotal_paise)
+        ));
+        buffer.push_str(&format!(
+            "CGST (2.5%):                                    {:>12}\n",
+            format_paise(bill.summary.cgst_paise)
+        ));
+        buffer.push_str(&format!(
+            "SGST (2.5%):                                    {:>12}\n",
+            format_paise(bill.summary.sgst_paise)
+        ));
+        buffer.push_str("------------------------------------------------------------\n");
+        buffer.push_str(&format!(
+            "GRAND TOTAL:                                    {:>12}\n",
+            format_paise(bill.summary.total_paise)
+        ));
+        buffer.push_str("============================================================\n");
+        buffer.push_str("           *** DUPLICATE COPY / REPRINT ***                 \n");
+        buffer.push_str("============================================================\n");
+
+        let latest_path = self.base_dir.join("receipt.txt");
+        let mut file = File::create(&latest_path)?;
+        file.write_all(buffer.as_bytes())?;
+
+        tracing::info!(bill_id = bill.id, "Exported duplicate receipt");
+        Ok(buffer)
+    }
 }
 
 #[cfg(test)]
@@ -409,5 +476,10 @@ mod tests {
         // Check receipt file creation
         let receipt_path = dir.path().join("receipt.txt");
         assert!(receipt_path.exists());
+
+        // Test duplicate receipt reprint
+        let dup = db.export_duplicate_receipt(&bill).unwrap();
+        assert!(dup.contains("*** DUPLICATE RECEIPT ***"));
+        assert!(dup.contains("Bill No: #101"));
     }
 }

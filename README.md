@@ -103,6 +103,7 @@ dhabatui
 | **`m`** | **Making Charges (*Banwai*)**: Add custom meat preparation |
 | **`e`** | **Alter Price**: Override unit price for active dish |
 | **`p`** | **Settle Bill**: Commit to `redb`, generate receipt, and clear table |
+| **`b`** | **Bill History**: Browse past invoices and reprint duplicate receipts |
 | **`q`** / **`Esc`** | Exit DhabaTUI or close popup modal |
 
 ---
