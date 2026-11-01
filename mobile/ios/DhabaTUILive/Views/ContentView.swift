@@ -49,7 +49,9 @@ struct ContentView: View {
                     }
                 }
             }
+#if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+#endif
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     HStack(spacing: 8) {
