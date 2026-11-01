@@ -14,7 +14,7 @@ pub fn render(f: &mut Frame, app: &mut App) {
     let main_chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
-            Constraint::Length(3), // Header banner with LAN URL
+            Constraint::Length(3), // Header banner
             Constraint::Length(3), // Interactive Tables Bar (T1..T8, Parcel)
             Constraint::Min(10),   // Content (Menu + Current Table Order)
             Constraint::Length(1), // Toast / Status line
@@ -38,19 +38,7 @@ pub fn render(f: &mut Frame, app: &mut App) {
 }
 
 fn render_header(f: &mut Frame, app: &App, area: Rect) {
-    let quick_code_indicator = if !app.quick_code_buffer.is_empty() {
-        format!("  [Code: {}_]  ", app.quick_code_buffer)
-    } else {
-        String::new()
-    };
-
-    let lan_info = if let Some(url) = app.lan_url() {
-        format!("  🌐 LAN Live Web: {url} (Network Only)")
-    } else {
-        "  🌐 LAN: Initializing...".to_string()
-    };
-
-    let title_line = Line::from(vec![
+    let mut spans = vec![
         Span::styled(
             " 🍲 DHABA TUI ",
             Style::default()
@@ -60,22 +48,23 @@ fn render_header(f: &mut Frame, app: &App, area: Rect) {
         ),
         Span::styled(
             "  Smart POS & Billing System",
-            Style::default().fg(Color::Cyan),
-        ),
-        Span::styled(
-            lan_info,
             Style::default()
-                .fg(Color::Green)
+                .fg(Color::Cyan)
                 .add_modifier(Modifier::BOLD),
         ),
-        Span::styled(
-            quick_code_indicator,
+    ];
+
+    if !app.quick_code_buffer.is_empty() {
+        spans.push(Span::styled(
+            format!("   [Code: {}_]  ", app.quick_code_buffer),
             Style::default()
                 .fg(Color::White)
                 .bg(Color::Red)
                 .add_modifier(Modifier::BOLD),
-        ),
-    ]);
+        ));
+    }
+
+    let title_line = Line::from(spans);
 
     let block = Block::default()
         .borders(Borders::ALL)
