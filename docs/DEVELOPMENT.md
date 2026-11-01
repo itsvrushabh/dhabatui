@@ -70,8 +70,26 @@ cargo clippy --all-targets -- -D warnings
 
 ## 5. Continuous Integration (CI)
 
-Every push and pull request to `main` triggers [`.github/workflows/ci.yml`](file:///home/cachyos/Work/dhabatui/.github/workflows/ci.yml), which:
+Every push and pull request to `main` triggers [`.github/workflows/ci.yml`](../.github/workflows/ci.yml), which:
 1. Runs `cargo fmt -- --check`.
 2. Runs `cargo clippy --all-targets -- -D warnings`.
 3. Executes all unit and integration tests.
 4. Builds release binaries across Linux, macOS, and Windows.
+
+---
+
+## 6. Releasing & Binary Packaging
+
+Automated releases are published via [`.github/workflows/release.yml`](../.github/workflows/release.yml) upon pushing a version tag:
+
+```bash
+# Tag a new release version
+git tag -a v0.1.0 -m "Release v0.1.0"
+git push origin v0.1.0
+```
+
+The release pipeline automatically:
+1. Builds release binaries for **Linux (x86_64)**, **Windows (x86_64)**, **macOS Apple Silicon (aarch64)**, and **macOS Intel (x86_64)**.
+2. Packages binaries (`dhabatui` + `dti`), `README.md`, and `LICENSE` into `.tar.gz` and `.zip` archives.
+3. Computes SHA256 checksums (`SHA256SUMS.txt`).
+4. Creates a new GitHub Release with attached download artifacts and auto-generated release notes.

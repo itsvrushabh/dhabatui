@@ -1,0 +1,128 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Release tag (e.g. v0.1.0)"
+        required: false
+        default: "v0.1.0"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build (${{ matrix.platform.name }})
+    runs-on: ${{ matrix.platform.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - name: Linux x86_64
+            os: linux
+            runs-on: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            archive_ext: tar.gz
+          - name: Windows x86_64
+            os: windows
+            runs-on: windows-latest
+            target: x86_64-pc-windows-msvc
+            archive_ext: zip
+          - name: macOS Apple Silicon (arm64)
+            os: macos
+            runs-on: macos-latest
+            target: aarch64-apple-darwin
+            archive_ext: tar.gz
+          - name: macOS Intel (x86_64)
+            os: macos
+            runs-on: macos-13
+            target: x86_64-apple-darwin
+            archive_ext: tar.gz
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform.target }}
+
+      - name: Build release binaries
+        run: cargo build --release --locked --target ${{ matrix.platform.target }}
+
+      - name: Package binaries
+        shell: bash
+        run: |
+          VERSION="${{ github.ref_name }}"
+          if [ -z "$VERSION" ] || [ "$VERSION" = "main" ]; then
+            VERSION="${{ github.event.inputs.tag_name || 'v0.1.0' }}"
+          fi
+
+          TARGET="${{ matrix.platform.target }}"
+          BIN_DIR="target/${TARGET}/release"
+          STAGING="dhabatui-${VERSION}-${TARGET}"
+          mkdir -p "$STAGING"
+
+          if [ "${{ matrix.platform.os }}" = "windows" ]; then
+            cp "$BIN_DIR/dhabatui.exe" "$STAGING/"
+            cp "$BIN_DIR/dti.exe" "$STAGING/"
+            [ -f README.md ] && cp README.md "$STAGING/"
+            [ -f LICENSE ] && cp LICENSE "$STAGING/"
+
+            cd "$STAGING"
+            7z a "../dhabatui-${VERSION}-${TARGET}.zip" *
+            cd ..
+          else
+            cp "$BIN_DIR/dhabatui" "$STAGING/"
+            cp "$BIN_DIR/dti" "$STAGING/"
+            [ -f README.md ] && cp README.md "$STAGING/"
+            [ -f LICENSE ] && cp LICENSE "$STAGING/"
+
+            tar -czf "dhabatui-${VERSION}-${TARGET}.tar.gz" -C "$STAGING" .
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-assets-${{ matrix.platform.target }}
+          path: |
+            dhabatui-*.tar.gz
+            dhabatui-*.zip
+          retention-days: 2
+
+  publish:
+    name: Publish Release Assets
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download compiled artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-to: true
+
+      - name: Generate SHA256 Checksums
+        shell: bash
+        run: |
+          cd dist
+          sha256sum dhabatui-* > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+          cd ..
+
+      - name: Create or Update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/dhabatui-*.tar.gz
+            dist/dhabatui-*.zip
+            dist/SHA256SUMS.txt
+          draft: false
+          prerelease: false
+          generate_release_notes: true
