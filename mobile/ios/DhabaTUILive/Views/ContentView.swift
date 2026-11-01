@@ -65,7 +65,7 @@ struct ContentView: View {
                             .foregroundColor(.white)
                     }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .primaryAction) {
                     Button(action: { showSettings = true }) {
                         Image(systemName: "gearshape.fill")
                             .foregroundColor(.white)
@@ -76,7 +76,9 @@ struct ContentView: View {
                 SettingsView(networkService: networkService, isPresented: $showSettings)
             }
         }
+#if os(iOS)
         .navigationViewStyle(.stack)
+#endif
     }
 }
 
@@ -206,10 +208,14 @@ struct SettingsView: View {
             Form {
                 Section(header: Text("Cashier Counter Network Setup")) {
                     TextField("IP Address (e.g. 192.168.1.50)", text: $ipText)
+#if os(iOS)
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
+#endif
                     TextField("Port (default 8080)", text: $portText)
+#if os(iOS)
                         .keyboardType(.numberPad)
+#endif
                 }
 
                 Section(footer: Text("Connect your iPhone/iPad to the same Wi-Fi network as the DhabaTUI terminal.")) {
@@ -223,7 +229,11 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Counter Setup")
-            .navigationBarItems(trailing: Button("Cancel") { isPresented = false })
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { isPresented = false }
+                }
+            }
             .onAppear {
                 ipText = networkService.counterIp
                 portText = networkService.counterPort
