@@ -36,9 +36,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_KEY: ${{ secrets.OPENAI_KEY || secrets.OPENAI_API_KEY }}
           OPENAI.API_KEY: ${{ secrets.OPENAI_KEY || secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GEMINI_KEY }}
           GEMINI_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GEMINI_KEY }}
           GOOGLE_AI_STUDIO.GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GEMINI_KEY }}
           ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_KEY || secrets.ANTHROPIC_API_KEY }}
+          CONFIG.MODEL: ${{ (secrets.OPENAI_KEY != '' || secrets.OPENAI_API_KEY != '') && 'gpt-4o' || 'gemini/gemini-1.5-flash' }}
           github_action_config.auto_describe: "true"
           github_action_config.auto_review: "true"
           github_action_config.auto_improve: "true"
