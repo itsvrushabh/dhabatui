@@ -33,7 +33,7 @@ pub fn render(f: &mut Frame, app: &mut App) {
         InputMode::EditingPrice => render_edit_price_modal(f, app),
         InputMode::AddingCustomName => render_custom_name_modal(f, app),
         InputMode::AddingCustomPrice => render_custom_price_modal(f, app),
-        InputMode::Normal | InputMode::QuickCode => {}
+        InputMode::Normal | InputMode::QuickCode | InputMode::SearchingMenu => {}
     }
 }
 
@@ -155,14 +155,17 @@ fn render_body(f: &mut Frame, app: &mut App, area: Rect) {
 
 fn render_menu(f: &mut Frame, app: &mut App, area: Rect) {
     let is_focused = app.active_pane == ActivePane::Menu;
-    let border_color = if is_focused {
+    let is_searching = app.input_mode == InputMode::SearchingMenu;
+    let border_color = if is_searching {
+        Color::Yellow
+    } else if is_focused {
         Color::Cyan
     } else {
         Color::DarkGray
     };
 
-    let items: Vec<ListItem> = app
-        .menu
+    let filtered = app.filtered_menu();
+    let items: Vec<ListItem> = filtered
         .iter()
         .map(|item| {
             let cat_color = match item.category.as_str() {
@@ -199,10 +202,25 @@ fn render_menu(f: &mut Frame, app: &mut App, area: Rect) {
         })
         .collect();
 
-    let title = if is_focused {
-        " [1] Menu Catalog ▶ (Enter: Add to Table | Digits: Quick Code) "
+    let cat_badge = match &app.selected_category {
+        Some(c) => format!("[Cat: {c}] "),
+        None => "[Cat: All] ".to_string(),
+    };
+
+    let title = if is_searching {
+        format!(
+            " 🔍 Search: {}_ (Enter: Add | Esc: Cancel) ",
+            app.search_query
+        )
+    } else if !app.search_query.is_empty() {
+        format!(
+            " [1] Menu ▶ {cat_badge}[Search: {}] (/:Search | f:Filter) ",
+            app.search_query
+        )
+    } else if is_focused {
+        format!(" [1] Menu Catalog ▶ {cat_badge}(/:Search | f:Filter | Enter:Add) ")
     } else {
-        " [1] Menu Catalog (Press Tab or 'h' to Focus) "
+        format!(" [1] Menu Catalog {cat_badge}(Press Tab or 'h' to Focus) ")
     };
 
     let list = List::new(items)
@@ -510,6 +528,20 @@ fn render_footer(f: &mut Frame, _app: &App, area: Rect) {
                 .add_modifier(Modifier::BOLD),
         ),
         Span::raw(":Settle | "),
+        Span::styled(
+            "/",
+            Style::default()
+                .fg(Color::Yellow)
+                .add_modifier(Modifier::BOLD),
+        ),
+        Span::raw(":Search | "),
+        Span::styled(
+            "f",
+            Style::default()
+                .fg(Color::Cyan)
+                .add_modifier(Modifier::BOLD),
+        ),
+        Span::raw(":Filter | "),
         Span::styled(
             "q",
             Style::default()
