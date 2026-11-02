@@ -231,3 +231,29 @@ fn run_app<B: ratatui::backend::Backend>(
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_documented_shortcuts_consistency() {
+        if let Ok(readme) = std::fs::read_to_string("README.md") {
+            // Verify 't' cycles tables and 'Tab' switches focus
+            assert!(
+                readme.contains("<kbd>t</kbd>"),
+                "README must document 't' for table cycling"
+            );
+            assert!(
+                readme.contains("<kbd>Tab</kbd>"),
+                "README must document 'Tab' for pane focus"
+            );
+            assert!(
+                !readme.contains("<kbd>Tab</kbd> | Cycle Tables"),
+                "README must NOT document Tab for cycling tables (regression prevention)"
+            );
+            assert!(
+                !readme.contains("print an itemized bill"),
+                "README must NOT claim hardware printing (app exports receipt.txt)"
+            );
+        }
+    }
+}

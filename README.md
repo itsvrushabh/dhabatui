@@ -15,7 +15,7 @@
 
 DhabaTUI is a lightweight cash register and billing application built for busy counter staff. It runs completely offline on any regular computer or laptop — meaning **you never lose a bill during power cuts or internet outages**.
 
-Instead of struggling with a slow mouse or complex cloud software during lunch and dinner rush hours, cashiers can punch a full table's order and print an itemized bill in **under 5 seconds** using simple keyboard shortcuts.
+Instead of struggling with a slow mouse or complex cloud software during lunch and dinner rush hours, cashiers can punch a full table's order and settle an itemized bill (saved to `receipt.txt`) in **under 5 seconds** using simple keyboard shortcuts.
 
 ---
 
@@ -62,7 +62,7 @@ Right-click the downloaded file and select **Extract All** (or uncompress).
 | Key | What It Does | When to Use |
 | :---: | :--- | :--- |
 | <kbd>t</kbd> / <kbd>T</kbd> | Cycle Tables (`T1` to `T8`, Parcel) | When guests sit at a new table |
-| <kbd>s</kbd> | Change Table Status | Toggle `Vacant` ➔ `Ordering` ➔ `Served` ➔ `Billed` |
+| <kbd>s</kbd> | Change Table Status | Toggle `Ordering` ➔ `Served` ➔ `Billed` (resets on settle <kbd>p</kbd> or clear <kbd>c</kbd>) |
 | <kbd>Tab</kbd> | Switch Focus (Menu ⟷ Cart) | To browse dishes or adjust order lines |
 | <kbd>0</kbd>–<kbd>9</kbd> + <kbd>Enter</kbd> | Quick Dish Number (e.g. `101`) | To punch items in 1 second |
 | <kbd>+</kbd> / <kbd>-</kbd> | Increase / Decrease item count | When guests order extra rotis |

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DhabaTUI — Fast, 100% Offline POS & Billing for Indian Dhabas</title>
-  <meta name="description" content="Simple, lightning-fast Terminal POS and billing software designed for Indian dhabas, tea stalls, and casual eateries. 100% offline, zero rounding errors.">
+  <meta name="description" content="Simple, lightning-fast Terminal POS and billing software designed for Indian dhabas, tea stalls, and casual eateries. 100% offline, exact paise math and zero floating-point drift.">
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍲</text></svg>">
 </head>
@@ -216,7 +216,7 @@
           <tr>
             <td><kbd>s</kbd></td>
             <td>Change Table Status</td>
-            <td>Toggle Vacant ➔ Ordering ➔ Served ➔ Billed</td>
+            <td>Toggle Ordering ➔ Served ➔ Billed (resets on settle <kbd>p</kbd> or clear <kbd>c</kbd>)</td>
           </tr>
           <tr>
             <td><kbd>Tab</kbd></td>
