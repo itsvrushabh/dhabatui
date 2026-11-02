@@ -39,7 +39,7 @@ jobs:
             archive_ext: tar.gz
           - name: macOS Intel (x86_64)
             os: macos
-            runs-on: macos-13
+            runs-on: macos-latest
             target: x86_64-apple-darwin
             archive_ext: tar.gz
 
@@ -126,30 +126,3 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: true
-
-  publish-cargo:
-    name: Publish to Crates.io
-    needs: publish
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Check for Crates.io Token
-        id: check_token
-        run: |
-          if [ -n "${{ secrets.CARGO_REGISTRY_TOKEN }}" ]; then
-            echo "has_token=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_token=false" >> "$GITHUB_OUTPUT"
-            echo "::notice ::CARGO_REGISTRY_TOKEN secret is not configured. Add CARGO_REGISTRY_TOKEN in repo Settings > Secrets and variables > Actions to enable automatic crates.io publishing."
-          fi
-
-      - name: Publish crate to crates.io
-        if: steps.check_token.outputs.has_token == 'true'
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: cargo publish --locked --token "${CARGO_REGISTRY_TOKEN}"
