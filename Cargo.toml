@@ -1,6 +1,6 @@
 [package]
 name = "dhabatui"
-version = "0.1.0"
+version = "0.1.2"
 edition = "2021"
 authors = ["Dhaba POS Team"]
 description = "Fast, keyboard-first Terminal POS and billing application for dhabas and casual eateries"
@@ -16,7 +16,9 @@ exclude = [
     "receipts/*",
     "dhabatui.log*",
     "dhabatui.redb*",
-    ".github/*"
+    ".github/*",
+    "wiki/*",
+    "scripts/*"
 ]
 
 [dependencies]

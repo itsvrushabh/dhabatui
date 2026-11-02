@@ -107,10 +107,13 @@ dhabatui
 
 ---
 
-## 📚 Complete Documentation
+## 📚 Complete Documentation & Project Wiki
 
-All detailed operating guides, architecture designs, and reference documentation are available in the [`docs/`](docs/) directory:
+All detailed operating guides, release specifications, architecture designs, and reference documentation are available in the repository docs and official Wiki:
 
+- 📖 **[Project Wiki](https://github.com/itsvrushabh/dhabatui/wiki)** (or local [`wiki/`](wiki/)): Complete knowledge base for cashiers, developers, and administrators.
+- 🗓️ **[Release Cycle & Cadence](docs/RELEASE_CYCLE.md)**: Yearly LTS, Monthly Minor, and Weekly Patch release policies, support matrix, and automation.
+- 📜 **[Changelog & Release Notes](CHANGELOG.md)**: Historical version release notes and upcoming changes.
 - 📖 **[Cashier's Guide & Workflow](docs/CASHIER_GUIDE.md)**: Full visual cashier guide with 4-step workflow, table management, making charges (*banwai*), and receipt samples.
 - 🌐 **[Live Web Dashboard (LAN Only)](docs/WEB_DASHBOARD.md)**: Embedded read-only kitchen and waitstaff monitor over private Wi-Fi networks.
 - 🏗️ **[System Architecture](docs/ARCHITECTURE.md)**: Embedded `redb` storage engine, multi-table domain, and thread architecture.

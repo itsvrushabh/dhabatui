@@ -106,12 +106,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: dist
-          merge-to: true
+          merge-multiple: true
 
       - name: Generate SHA256 Checksums
         shell: bash
         run: |
           cd dist
+          find . -mindepth 2 -type f -exec mv -t . {} + 2>/dev/null || true
           sha256sum dhabatui-* > SHA256SUMS.txt
           cat SHA256SUMS.txt
           cd ..
