@@ -82,6 +82,6 @@ $$\text{Format: } \mathbf{v\text{MAJOR}.\text{MINOR}.\text{PATCH}}$$
 
 1. **`main` Branch**: Active trunk for all feature and bugfix PR merges. All CI checks, tests, and formatting checks must pass before merging.
 2. **Release Tags (`v*`)**: Pushed tags trigger the release pipelines:
-   * Multi-platform cross-compilation binaries ([`.github/workflows/release.yml`](file:///home/cachyos/Work/dhabatui/.github/workflows/release.yml)).
-   * Crates.io package publication ([`.github/workflows/cargo-publish.yml`](file:///home/cachyos/Work/dhabatui/.github/workflows/cargo-publish.yml)).
+   * Multi-platform cross-compilation binaries ([`.github/workflows/release.yml`](https://github.com/itsvrushabh/dhabatui/blob/main/.github/workflows/release.yml)).
+   * Crates.io package publication ([`.github/workflows/cargo-publish.yml`](https://github.com/itsvrushabh/dhabatui/blob/main/.github/workflows/cargo-publish.yml)).
 3. **LTS Maintenance Branches (`lts/vX`)**: Created for yearly LTS releases if patch backports are required while `main` is developing the next major version.

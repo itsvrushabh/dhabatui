@@ -51,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Bill History & Receipts**: View, search, and reprint past finalized receipts.
 - **Day-End Shift Closure**: Daily sales summary, GST reports, and cash vs UPI breakdown.
 - **Local LAN HTTP Server**: Built-in HTTP server (`tiny_http`) serving mobile-friendly web dashboard at `http://<LAN-IP>:8080`.
-- **Diagnostic Tool (`dti`)**: Companion CLI binary for inspecting database, menu, and server status.
+- **Rapid Command Alias (`dti`)**: Fast 3-letter binary alias for instant terminal POS launching.
 - **Cross-Platform Release Binaries**: Pre-compiled binaries for Linux, macOS (Apple Silicon & Intel), and Windows.
 
 ---

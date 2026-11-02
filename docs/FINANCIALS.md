@@ -68,7 +68,7 @@ $$\text{Grand Total} = 61000 + 1525 + 1525 = 64050\text{ paise } (₹640.50)$$
 
 ## 3. Thermal Receipt Format
 
-When an order is settled (`p`), DhabaTUI writes a 60-column plain-text receipt formatted for direct printing to 3-inch (80mm) thermal ESC/POS receipt printers:
+When an order is settled (`p`), DhabaTUI writes a 60-column plain-text receipt formatted for standard 80mm paper width to `receipt.txt`:
 
 ```text
 ============================================================
@@ -95,5 +95,5 @@ GRAND TOTAL:                                      ₹640.50
 ============================================================
 ```
 
-- **Primary Receipt**: Saved to [`receipt.txt`](file:///home/cachyos/Work/dhabatui/receipt.txt).
-- **Audit Archive**: Saved to [`receipts/bill_<id>.txt`](file:///home/cachyos/Work/dhabatui/receipts/).
+- **Primary Receipt**: Saved to `receipt.txt`.
+- **Audit Archive**: Saved to `receipts/bill_<id>.txt`.
