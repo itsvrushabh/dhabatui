@@ -65,7 +65,8 @@ When writing new features or fixing bugs, adhere strictly to these engineering i
 When a Pull Request is opened against `main`:
 1. **GitHub Copilot Reviewer**: Reviews code changes for architecture and security issues.
 2. **PR-Agent**: Automatically generates an itemized `/describe` walkthrough and runs automated `/review`.
-3. **Cross-Platform Matrix CI**:
+3. **OpenCode Agent**: Authenticates via OIDC with OpenCode Console to review PRs and respond to `/oc` interactive comments.
+4. **Cross-Platform Matrix CI**:
    - `ubuntu-latest`: Runs `cargo test`, `cargo clippy`, and `cargo fmt`.
    - `macos-latest`: Builds for macOS.
    - `windows-latest`: Builds for Windows.

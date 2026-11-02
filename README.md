@@ -120,6 +120,7 @@ All detailed operating guides, release specifications, architecture designs, and
 - 💰 **[Financials & GST Math](docs/FINANCIALS.md)**: Integer paise representation and exact half-up rounding for 2.5% CGST + 2.5% SGST.
 - 🛠️ **[Developer & Testing Guide](docs/DEVELOPMENT.md)**: Building, test suite, and CI/CD pipelines.
 - 🤖 **[PR-Agent Automated Reviews](docs/PR_AGENT_GUIDE.md)**: AI-driven automated pull request analysis and review workflow.
+- ⚡ **[OpenCode Code Reviews](docs/OPENCODE_GUIDE.md)**: Interactive AI coding agent and automated PR reviews with OIDC console authentication.
 
 ---
 
