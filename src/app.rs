@@ -458,8 +458,9 @@ impl App {
         let table = self.active_table();
         if let Some(i) = self.cart_state.selected() {
             if let Some(item) = table.items.get(i) {
-                let rupees = item.price_paise as f64 / 100.0;
-                self.input_buffer = format!("{:.2}", rupees);
+                let rupees = item.price_paise / 100;
+                let remainder = item.price_paise % 100;
+                self.input_buffer = format!("{}.{:02}", rupees, remainder);
                 self.input_mode = InputMode::EditingPrice;
             }
         } else {

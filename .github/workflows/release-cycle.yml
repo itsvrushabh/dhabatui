@@ -1,0 +1,116 @@
+name: Release Cycle Automation
+
+on:
+  schedule:
+    # Weekly Sunday Release at 00:00 UTC
+    - cron: '0 0 * * 0'
+    # Monthly 1st of the month Feature Release at 00:00 UTC
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: "Release Cadence Type"
+        required: true
+        type: choice
+        default: "patch"
+        options:
+          - "patch"
+          - "minor"
+          - "major_lts"
+      dry_run:
+        description: "Dry Run (test versioning and changelog without tagging or pushing)"
+        required: false
+        type: boolean
+        default: false
+      custom_version:
+        description: "Custom Version override (e.g. 1.0.0)"
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  automate-release:
+    name: Execute Release Cadence
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Determine Release Cadence Type
+        id: cadence
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            CADENCE_TYPE="${{ github.event.inputs.release_type }}"
+          else
+            # Scheduled cron run: determine cadence from current UTC date
+            DAY_OF_YEAR=$(date -u +%m%d)
+            DAY_OF_MONTH=$(date -u +%d)
+            if [ "$DAY_OF_YEAR" = "0101" ]; then
+              CADENCE_TYPE="major_lts"
+            elif [ "$DAY_OF_MONTH" = "01" ]; then
+              CADENCE_TYPE="minor"
+            else
+              CADENCE_TYPE="patch"
+            fi
+          fi
+          echo "cadence_type=${CADENCE_TYPE}" >> "$GITHUB_OUTPUT"
+          echo "Selected Release Cadence: ${CADENCE_TYPE}"
+
+      - name: Prepare Release (Version bump & Changelog)
+        id: prepare
+        env:
+          CADENCE_TYPE: ${{ steps.cadence.outputs.cadence_type }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+          CUSTOM_VER: ${{ github.event.inputs.custom_version || '' }}
+        run: |
+          ARGS=(--type "$CADENCE_TYPE")
+          if [ "$DRY_RUN" = "true" ]; then
+            ARGS+=(--dry-run)
+          fi
+          if [ -n "$CUSTOM_VER" ]; then
+            ARGS+=(--version "$CUSTOM_VER")
+          fi
+
+          ./scripts/prepare-release.sh "${ARGS[@]}"
+
+          # Extract prepared tag
+          NEW_TAG="v$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')"
+          echo "new_tag=${NEW_TAG}" >> "$GITHUB_OUTPUT"
+          echo "Target tag: ${NEW_TAG}"
+
+      - name: Commit, Tag, and Push Release
+        if: github.event.inputs.dry_run != 'true'
+        env:
+          NEW_TAG: ${{ steps.prepare.outputs.new_tag }}
+        run: |
+          # Check if there are changes to commit
+          if git diff --quiet Cargo.toml Cargo.lock CHANGELOG.md 2>/dev/null; then
+            echo "No repository changes to commit."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+
+            git add Cargo.toml Cargo.lock CHANGELOG.md
+            git commit -m "chore(release): ${NEW_TAG} [skip ci]"
+            git push origin HEAD:main
+            echo "Pushed release commit to main."
+          fi
+
+          # Check if tag already exists
+          if git rev-parse "${NEW_TAG}" >/dev/null 2>&1; then
+            echo "Tag ${NEW_TAG} already exists. Skipping tag creation."
+          else
+            git tag -a "${NEW_TAG}" -m "DhabaTUI ${NEW_TAG} Release"
+            git push origin "${NEW_TAG}"
+            echo "Created and pushed tag ${NEW_TAG}."
+            echo "This tag push will trigger both 'Release' and 'Cargo Publish' workflows."
+          fi
