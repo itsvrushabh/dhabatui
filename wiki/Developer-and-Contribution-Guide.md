@@ -54,7 +54,7 @@ cargo fmt --all -- --check
 When writing new features or fixing bugs, adhere strictly to these engineering invariants:
 
 1. **Paise-Only Math**: Never use `f32` or `f64` for money. Use `u64` representing paise.
-2. **Keyboard-First**: Every action in the TUI must have a single-key shortcut (`[Tab]`, `[Enter]`, `[K]`, `[B]`, `[Esc]`, `[Q]`).
+2. **Keyboard-First**: Every action in the TUI must have a single-key shortcut (`[t]`, `[s]`, `[Tab]`, `[Enter]`, `[m]`, `[p]`, `[q]`).
 3. **Offline-First**: Never introduce external cloud HTTP calls in core billing pathways.
 4. **Resilient Error Handling**: Use `thiserror` for library error types; never panic (`unwrap()` / `expect()`) inside the TUI render loop.
 

@@ -26,11 +26,14 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
-      - name: Ensure site assets directory
+      - name: Prepare site assets
         run: |
+          rm -rf site/assets
           mkdir -p site/assets
-          cp -r assets/* site/assets/ 2>/dev/null || true
+          cp -r assets/* site/assets/
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

@@ -67,20 +67,20 @@
 
         <div class="feature-card">
           <span class="feature-icon">💰</span>
-          <h3>Zero Rounding Errors (Paise Math)</h3>
-          <p>All calculations use exact Indian Paise (100 paise = ₹1.00). Eliminates software rounding drift so your cash drawer balances to the exact rupee every night.</p>
+          <h3>Exact Integer Paise Math (Zero Floating-Point Drift)</h3>
+          <p>All calculations use exact integer Indian Paise (100 paise = ₹1.00) with half-up GST rounding. Eliminates computer floating-point drift so your cash drawer balances to the single rupee every night.</p>
         </div>
 
         <div class="feature-card">
           <span class="feature-icon">⚡</span>
           <h3>Lightning-Fast Keyboard Entry</h3>
-          <p>No mouse required. Cashiers memorize 2-digit dish numbers (like 101 for Dal Tadka) and punch an entire family order in under 5 seconds.</p>
+          <p>No mouse required. Cashiers memorize dish codes (like 101 for Dal Tadka) and punch an entire family order in under 5 seconds.</p>
         </div>
 
         <div class="feature-card">
           <span class="feature-icon">🪑</span>
           <h3>8 Tables & Parcel Orders</h3>
-          <p>Instantly switch between 8 dining tables plus takeaway parcels with a single press of the Tab key. See occupied, vacant, and billed tables at a glance.</p>
+          <p>Instantly switch between 8 dining tables plus takeaway parcels with the <kbd>t</kbd> key. Switch focus between menu and cart with <kbd>Tab</kbd>. See occupied, vacant, and billed tables at a glance.</p>
         </div>
 
         <div class="feature-card">
@@ -209,14 +209,24 @@
         </thead>
         <tbody>
           <tr>
-            <td><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd></td>
-            <td>Switch Tables (T1 to T8, Parcel)</td>
+            <td><kbd>t</kbd> / <kbd>T</kbd></td>
+            <td>Cycle Tables (T1 to T8, Parcel)</td>
             <td>When guests sit at a new table or order takeaway</td>
+          </tr>
+          <tr>
+            <td><kbd>s</kbd></td>
+            <td>Change Table Status</td>
+            <td>Toggle Vacant ➔ Ordering ➔ Served ➔ Billed</td>
+          </tr>
+          <tr>
+            <td><kbd>Tab</kbd></td>
+            <td>Switch Focus (Menu ⟷ Cart)</td>
+            <td>To browse dishes or adjust order lines</td>
           </tr>
           <tr>
             <td><kbd>0</kbd>–<kbd>9</kbd> + <kbd>Enter</kbd></td>
             <td>Quick Item Code Entry (e.g. <code>101</code>)</td>
-            <td>To add dishes in 1 second by their menu number</td>
+            <td>To add dishes in 1 second by their 3-digit menu number</td>
           </tr>
           <tr>
             <td><kbd>+</kbd> / <kbd>-</kbd></td>
@@ -235,8 +245,8 @@
           </tr>
           <tr>
             <td><kbd>p</kbd></td>
-            <td>Print Bill & Settle</td>
-            <td>When guests ask for bill (Cash, UPI QR, or Card)</td>
+            <td>Settle Bill & Save Receipt</td>
+            <td>When guests ask for bill (saves to <code>receipt.txt</code>)</td>
           </tr>
           <tr>
             <td><kbd>q</kbd> / <kbd>Esc</kbd></td>

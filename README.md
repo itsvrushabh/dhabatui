@@ -23,8 +23,8 @@ Instead of struggling with a slow mouse or complex cloud software during lunch a
 
 - 🔌 **100% Offline**: No internet or cloud subscription needed. Everything runs locally on your counter computer.
 - 💰 **Exact Paise Accuracy**: Uses zero-float integer math (`100 paise = ₹1.00`). Eliminates computer rounding drift so your cash drawer balances to the single rupee every night.
-- ⚡ **Ultra-Fast Keyboard Entry**: Memorize 2-digit dish numbers (like `101` for Dal Tadka) and add items in milliseconds.
-- 🪑 **8 Tables + Parcel Orders**: Switch between Dining Tables (`T1`–`T8`) and takeaway parcels with a single press of the `[Tab]` key.
+- ⚡ **Ultra-Fast Keyboard Entry**: Memorize dish codes (like `101` for Dal Tadka) and add items in milliseconds.
+- 🪑 **8 Tables + Parcel Orders**: Switch between Dining Tables (`T1`–`T8`) and takeaway parcels with the <kbd>t</kbd> key. Focus menu/cart with <kbd>Tab</kbd>.
 - 🥩 **Customer Meat Cooking (*Banwai*)**: Easily add custom meat preparation charges on the fly when guests bring their own raw chicken or mutton.
 - 📱 **Mobile View for Waiters & Kitchen**: Kitchen staff and waiters can open their phone browser on your dhaba's local Wi-Fi to view active table orders in real-time.
 
@@ -61,12 +61,14 @@ Right-click the downloaded file and select **Extract All** (or uncompress).
 
 | Key | What It Does | When to Use |
 | :---: | :--- | :--- |
-| <kbd>Tab</kbd> | Cycle Tables (`T1` to `T8`, Parcel) | When guests sit at a new table |
+| <kbd>t</kbd> / <kbd>T</kbd> | Cycle Tables (`T1` to `T8`, Parcel) | When guests sit at a new table |
+| <kbd>s</kbd> | Change Table Status | Toggle `Vacant` ➔ `Ordering` ➔ `Served` ➔ `Billed` |
+| <kbd>Tab</kbd> | Switch Focus (Menu ⟷ Cart) | To browse dishes or adjust order lines |
 | <kbd>0</kbd>–<kbd>9</kbd> + <kbd>Enter</kbd> | Quick Dish Number (e.g. `101`) | To punch items in 1 second |
 | <kbd>+</kbd> / <kbd>-</kbd> | Increase / Decrease item count | When guests order extra rotis |
 | <kbd>m</kbd> | Customer Cooking Fee (*Banwai*) | For customer-brought raw meat preparation |
 | <kbd>e</kbd> | Change Price On-the-Fly | To adjust price or give discount |
-| <kbd>p</kbd> | Finalize Bill & Print Receipt | When customer asks for bill (Cash/UPI/Card) |
+| <kbd>p</kbd> | Settle Bill & Save Receipt | Finalize order and save to `receipt.txt` |
 | <kbd>q</kbd> / <kbd>Esc</kbd> | Close Window / Exit | To close any popup safely |
 
 ---
@@ -77,9 +79,10 @@ Right-click the downloaded file and select **Extract All** (or uncompress).
 * 📖 **[Project Wiki](https://github.com/itsvrushabh/dhabatui/wiki)** (or local [`wiki/`](wiki/)): Full knowledge base and operations manual.
 * 👨‍🍳 **[Cashier's Visual Guide](docs/CASHIER_GUIDE.md)**: Visual 4-step workflow for counter staff.
 * 📱 **[LAN Mobile Dashboard](docs/WEB_DASHBOARD.md)**: How to view orders on mobile phones over local Wi-Fi.
+* 💰 **[Financials & Zero-Float Invariant](docs/FINANCIALS.md)**: Exact paise math and half-up GST rounding.
 * 🗓️ **[Release Cycle & Cadence](docs/RELEASE_CYCLE.md)**: Yearly LTS, Monthly Minor, and Weekly Patch schedules.
 * 📜 **[Changelog](CHANGELOG.md)**: Version history and updates.
-* 🛠️ **[Developer & Testing Guide](docs/DEVELOPMENT.md)**: Compiling, testing, and architecture.
+* 🛠️ **[Developer & Contribution Guide](docs/DEVELOPMENT.md)**: Compiling, testing, and architecture.
 
 ---
 

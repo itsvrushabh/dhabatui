@@ -8,53 +8,44 @@ This operational manual is designed for cashiers, counter staff, and dhaba manag
 
 | Key | Action | Context |
 | :---: | :--- | :--- |
-| `[Tab]` / `[Shift+Tab]` | Switch between Tables | Main Tables view |
-| `[Enter]` | Open Table / Confirm Action | Any view |
-| `[A]` | Add Menu Item to active table | Table order screen |
-| `[D]` | Delete / Decrement selected item | Table order screen |
-| `[K]` | Generate Kitchen Order Ticket (KOT) | Table order screen |
-| `[B]` | Finalize and Print Bill | Table order screen |
-| `[H]` | View Bill History & Receipts | Main view |
-| `[S]` | Day-End Shift & Sales Summary | Main view |
-| `[M]` | Open Menu Management & Pricing | Main view |
-| `[Esc]` | Cancel / Back / Return | Any modal / screen |
-| `[Q]` | Exit DhabaTUI safely | Main view |
+| `[t]` / `[T]` | Cycle Dining Tables (`T1`–`T8`, Parcel) | Table bar at top |
+| `[Shift+Tab]` | Cycle Dining Tables Backward | Table bar at top |
+| `[s]` | Cycle Table Status (`Vacant` ➔ `Ordering` ➔ `Served` ➔ `Billed`) | Table bar at top |
+| `[Tab]` | Switch Focus (Menu Catalog ⟷ Order Cart) | Main panes |
+| `[Enter]` | Add highlighted item to order / Confirm modal | Menu Catalog |
+| `[0]`–`[9]` + `[Enter]` | Rapid 3-digit dish code entry (e.g. `101`) | Fast counter ordering |
+| `[+]` / `[-]` | Increase or decrease item quantity | Order Cart |
+| `[m]` | Add custom meat cooking fee (*Banwai*) | Modal dialog |
+| `[e]` | Alter unit price / discount on-the-fly | Order Cart |
+| `[p]` | Settle Bill, calculate GST & save `receipt.txt` | Active table |
+| `[c]` | Clear all items from active table | Active table |
+| `[q]` / `[Esc]` | Close modal dialog / Exit DhabaTUI | Any screen |
 
 ---
 
 ## 🍛 Typical Dhaba Order Workflow
 
 ### 1. Seating Guests & Punching Orders
-1. Cashier uses `[Tab]` to highlight **Table 3** (shows `[Vacant]`).
-2. Press `[Enter]` to open the table.
-3. Press `[A]` to open quick menu entry:
-   - Type item code (e.g., `M1` for Special Chai, `R2` for Dal Tadka) or use arrows.
-   - Enter quantity (e.g. `2`) and press `[Enter]`.
+1. Cashier presses `[t]` to cycle to the table (e.g., **T3**).
+2. Status will automatically update from `[Vacant]` to `[Ordering]` upon adding the first item, or press `[s]` to set manually.
+3. Add items:
+   - **Quick code**: Type dish code (e.g., `101` for Dal Tadka) and press `[Enter]`.
+   - **Menu browse**: Use `↑` / `↓` in the Menu Catalog pane and press `[Enter]`.
 4. Table subtotal automatically updates in paise.
 
-### 2. Sending Order to Kitchen (KOT)
-1. Press `[K]` to generate a **Kitchen Order Ticket (KOT)**.
-2. The KOT records newly added items, timestamp, and table number, and resets the unprinted item count.
-3. Kitchen staff receives the slip or views it via mobile dashboard.
+### 2. Customer Meat Cooking (*Banwai*)
+When guests bring their own raw meat/chicken:
+1. Press `[m]` to open the Making Charge modal.
+2. Enter custom dish description (e.g., `1/2kg Mutton Masala (Making)`) and press `[Enter]`.
+3. Enter negotiated cooking charge in rupees (e.g., `180.00`) and press `[Enter]`.
+4. The dish is added to the cart with a special `*` custom indicator.
 
-### 3. Finalizing Bill & Payment
-1. When guests request the bill, press `[B]`.
-2. Select payment method:
-   - `[1]` Cash
-   - `[2]` UPI / QR Code (displays registered Dhaba UPI ID)
-   - `[3]` Card
-3. Press `[Enter]` to print receipt.
-4. Bill is committed to the ACID store and Table 3 resets to `[Vacant]`.
+### 3. Adjusting Quantities or On-the-Fly Prices
+1. Press `[Tab]` to focus the Order Cart pane.
+2. Use `↑` / `↓` to select an item.
+3. Press `[+]` or `[-]` to adjust quantity.
+4. Press `[e]` to alter unit price on-the-fly (e.g., regular customer discount).
 
----
-
-## 📊 End-of-Day Shift Closure
-
-At the end of the shift or day:
-1. Press `[S]` to open the **Daily Settlement Report**.
-2. View totals:
-   - Total Gross Sales (₹)
-   - Total GST Collected (CGST + SGST)
-   - Cash in Drawer vs UPI receipts
-   - Total Bills issued and table turnover rate
-3. Press `[P]` to export or print the settlement summary.
+### 4. Finalizing Bill & Receipt
+1. When guests request the bill, press `[p]`.
+2. DhabaTUI settles the bill, applies GST half-up rounding in exact paise, resets the table to `[Vacant]`, and outputs a formatted bill to `receipt.txt`.
