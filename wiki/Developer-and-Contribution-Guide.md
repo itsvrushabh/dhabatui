@@ -25,9 +25,9 @@ This guide covers everything you need to know to build, test, and contribute to 
    cargo run
    ```
 
-3. Run the companion CLI diagnostic tool:
+3. Run using the companion binary alias:
    ```bash
-   cargo run --bin dti -- inspect
+   cargo run --bin dti
    ```
 
 ---

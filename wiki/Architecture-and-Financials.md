@@ -52,22 +52,19 @@ DhabaTUI utilizes **Redb** (`redb = "2"`), an embedded, pure-Rust, transactional
 - **Crash Resilient**: If power cuts or accidental terminal closures occur during rush hour, transactions are either fully committed or safely rolled back.
 
 ### Tables in Redb:
-1. `tables`: Current table occupancy, active items, and subtotal.
-2. `bills`: Historical finalized bills with timestamp, payment method, and itemized breakdown.
-3. `menu`: Active menu catalog, item codes, and prices.
-4. `config`: Dhaba profile (name, phone, address, GSTIN, UPI ID).
+1. `menu_items`: Default catalog items, 3-digit dish codes, category, and unit price in paise.
+2. `bills`: Historical finalized bills (`u64` bill ID sequence to serialized `BillRecord` with exact paise calculations).
+3. `metadata`: Sequence counter for atomic bill ID generation and schema metadata.
 
 ---
 
 ## 🌐 Local LAN HTTP Dashboard
 
 DhabaTUI embeds a lightweight HTTP server via `tiny_http`:
-- Binds to `0.0.0.0:8080`.
+- Binds to `0.0.0.0:8080` (or falls back to subsequent available ports).
 - Automatically detects and displays local LAN IP (e.g., `http://192.168.1.45:8080`).
 - Serves:
-  - Responsive HTML/CSS/JS dashboard for mobile phones and tablets.
-  - JSON API endpoints:
-    - `GET /api/status`: Active tables, totals, and occupancy.
-    - `GET /api/menu`: Menu items with pricing.
-    - `GET /api/reports`: Daily settlement and shift summaries.
+  - Responsive HTML/CSS/JS dashboard for mobile phones and tablets to view dining hall table orders in real time.
+  - JSON API endpoint:
+    - `GET /api/status`: Active tables, occupancy, items, totals in paise, and recent bills.
 - Zero external network access needed — functions seamlessly over local Wi-Fi or mobile hotspots without internet.
