@@ -56,4 +56,5 @@ jobs:
           OPENCODE_API_KEY: ${{ env.OPENCODE_API_KEY || secrets.OPENCODE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          model: ${{ secrets.OPENCODE_MODEL || 'opencode/big-pickle' }}
           prompt: ${{ github.event_name == 'pull_request' && 'Review this pull request for bugs, code quality, test coverage, and adherence to zero-float integer paise arithmetic.' || '' }}
