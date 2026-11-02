@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">DhabaTUI Live</string>
+    <string name="app_subtitle">Kitchen &amp; Order Display System</string>
+    <string name="default_counter_ip">192.168.1.10</string>
+    <string name="default_counter_port">8080</string>
+</resources>
