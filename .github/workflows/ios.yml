@@ -1,0 +1,26 @@
+name: iOS Build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'mobile/ios/**'
+      - '.github/workflows/ios.yml'
+  pull_request:
+    paths:
+      - 'mobile/ios/**'
+      - '.github/workflows/ios.yml'
+
+jobs:
+  build:
+    name: Build iOS App
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Swift Package / App
+        run: |
+          cd mobile/ios
+          swift build -v
