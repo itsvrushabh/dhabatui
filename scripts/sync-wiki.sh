@@ -10,7 +10,21 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WIKI_DIR="${REPO_ROOT}/wiki"
-WIKI_REMOTE="${1:-https://github.com/itsvrushabh/dhabatui.wiki.git}"
+WIKI_REMOTE="https://github.com/itsvrushabh/dhabatui.wiki.git"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --repo)
+      WIKI_REMOTE="$2"
+      shift 2
+      ;;
+    *)
+      WIKI_REMOTE="$1"
+      shift
+      ;;
+  esac
+done
+
 TEMP_DIR=$(mktemp -d)
 
 trap 'rm -rf "$TEMP_DIR"' EXIT

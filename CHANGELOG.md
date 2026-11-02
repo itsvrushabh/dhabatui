@@ -9,12 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [0.1.2] - 2026-11-02
+
 ### Added
 - Automated release cycle workflow (`.github/workflows/release-cycle.yml`) supporting Yearly LTS, Monthly Minor, and Weekly Patch releases.
 - Release preparation automation script (`scripts/prepare-release.sh`) with dry-run support.
+- OpenCode automated pull request review workflow (`.github/workflows/opencode-review.yml`) with OIDC authentication.
 - Comprehensive Project Wiki (`wiki/`) covering Architecture, Financials, Release Cycle, Developer Guide, and Cashier Operations.
 - Wiki synchronization script (`scripts/sync-wiki.sh`).
-- Release cycle specification document (`docs/RELEASE_CYCLE.md`).
+- Release cycle specification document (`docs/RELEASE_CYCLE.md`) and OpenCode guide (`docs/OPENCODE_GUIDE.md`).
 
 ### Fixed
 - Fixed GitHub Actions release artifact download in `.github/workflows/release.yml` using `merge-multiple: true` to prevent `sha256sum: dhabatui-*: No such file or directory` errors.

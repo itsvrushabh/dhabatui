@@ -87,8 +87,8 @@ if [ -z "$COMMITS" ] && [ "$DRY_RUN" = "false" ] && [ -z "$CUSTOM_VERSION" ]; th
 fi
 
 # Categorize commits
-FEATS=$(echo "$COMMITS" | grep -iE '^[a-f0-9]+ feat' || true)
-FIXES=$(echo "$COMMITS" | grep -iE '^[a-f0-9]+ fix' || true)
+FEATS=$(echo "$COMMITS" | grep -iE '^[a-f0-9]+ feat' | grep -ivE '\((android|ios|mobile)\)' || true)
+FIXES=$(echo "$COMMITS" | grep -iE '^[a-f0-9]+ fix' | grep -ivE '\((android|ios|mobile)\)' || true)
 MOBILE=$(echo "$COMMITS" | grep -iE '^[a-f0-9]+ (ci|feat|fix)\((android|ios|mobile)\)' || true)
 CIS=$(echo "$COMMITS" | grep -iE '^[a-f0-9]+ (ci|chore|refactor)' | grep -ivE 'mobile|android|ios' || true)
 DOCS=$(echo "$COMMITS" | grep -iE '^[a-f0-9]+ docs' || true)
@@ -131,6 +131,13 @@ if [ -n "$DOCS" ]; then
   done <<< "$DOCS"
 fi
 
+if [ -n "$OTHERS" ]; then
+  NOTES+=$'\n### 🔍 Other Changes\n'
+  while IFS= read -r line; do
+    [ -n "$line" ] && NOTES+="- ${line}"$'\n'
+  done <<< "$OTHERS"
+fi
+
 if [ -z "$NOTES" ]; then
   NOTES+=$'\n- Maintenance release and dependency updates.\n'
 fi
@@ -149,8 +156,15 @@ if [ "$DRY_RUN" = "true" ]; then
   exit 0
 fi
 
-# 1. Update Cargo.toml
-sed -i -E "s/^version = \"[0-9]+\.[0-9]+\.[0-9]+\"/version = \"${NEW_VERSION}\"/" Cargo.toml
+# 1. Update Cargo.toml (scoped to [package] table)
+python3 -c "
+import re
+with open('Cargo.toml', 'r') as f:
+    c = f.read()
+new_c = re.sub(r'(\[package\][^\[]*?version\s*=\s*\")[^\"]+(\")', r'\g<1>${NEW_VERSION}\g<2>', c, count=1)
+with open('Cargo.toml', 'w') as f:
+    f.write(new_c)
+" 2>/dev/null || sed -i -E "0,/^version = \"[0-9]+\.[0-9]+\.[0-9]+\"/s//version = \"${NEW_VERSION}\"/" Cargo.toml
 echo "Updated Cargo.toml to version ${NEW_VERSION}"
 
 # 2. Synchronize Cargo.lock
