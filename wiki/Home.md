@@ -10,7 +10,7 @@ Welcome to the official documentation and knowledge base for **DhabaTUI** — th
 | :--- | :--- |
 | **[Release Cycle & Cadence](Release-Cycle-and-Cadence)** | Yearly LTS, Monthly Minor, and Weekly Patch cadence, support matrix, and SemVer rules |
 | **[Release Automation Guide](Release-Automation-Guide)** | GitHub Actions release workflows, automated tag generation, and crates.io publishing |
-| **[Architecture & Financials](Architecture-and-Financials)** | Integer paise math guarantee, Redb ACID persistence, LAN HTTP server, and mobile sync |
+| **[Architecture & Financials](Architecture-and-Financials)** | Integer paise math guarantee, Redb ACID persistence, LAN HTTP server, and read-only mobile dashboard |
 | **[Developer & Contribution Guide](Developer-and-Contribution-Guide)** | Local setup, building, testing, linting conventions, and pull request review workflows |
 | **[Cashier & Staff Operations](Cashier-and-Staff-Operations)** | Rapid keyboard shortcuts, table billing, customer meat cooking (Banwai), and receipt generation |
 

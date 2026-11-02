@@ -236,24 +236,43 @@ fn run_app<B: ratatui::backend::Backend>(
 mod tests {
     #[test]
     fn test_documented_shortcuts_consistency() {
-        if let Ok(readme) = std::fs::read_to_string("README.md") {
-            // Verify 't' cycles tables and 'Tab' switches focus
-            assert!(
-                readme.contains("<kbd>t</kbd>"),
-                "README must document 't' for table cycling"
-            );
-            assert!(
-                readme.contains("<kbd>Tab</kbd>"),
-                "README must document 'Tab' for pane focus"
-            );
-            assert!(
-                !readme.contains("<kbd>Tab</kbd> | Cycle Tables"),
-                "README must NOT document Tab for cycling tables (regression prevention)"
-            );
-            assert!(
-                !readme.contains("print an itemized bill"),
-                "README must NOT claim hardware printing (app exports receipt.txt)"
-            );
-        }
+        const README: &str = include_str!("../README.md");
+        const SITE: &str = include_str!("../site/index.html");
+
+        // Verify 't' cycles tables and 'Tab' switches focus in README
+        assert!(
+            README.contains("<kbd>t</kbd>"),
+            "README must document 't' for table cycling"
+        );
+        assert!(
+            README.contains("<kbd>Tab</kbd>"),
+            "README must document 'Tab' for pane focus"
+        );
+        assert!(
+            !README.contains("<kbd>Tab</kbd> | Cycle Tables"),
+            "README must NOT document Tab for cycling tables (regression prevention)"
+        );
+        assert!(
+            !README.contains("print an itemized bill"),
+            "README must NOT claim hardware printing (app exports receipt.txt)"
+        );
+
+        // Verify documentation website accuracy
+        assert!(
+            SITE.contains("<kbd>t</kbd>"),
+            "site/index.html must document 't' for table cycling"
+        );
+        assert!(
+            SITE.contains("<kbd>Tab</kbd>"),
+            "site/index.html must document 'Tab' for pane focus"
+        );
+        assert!(
+            !SITE.contains("zero rounding errors"),
+            "site/index.html must NOT claim zero rounding errors (GST uses integer half-up rounding)"
+        );
+        assert!(
+            !SITE.contains("kitchen tickets"),
+            "site/index.html must NOT claim kitchen tickets (app has read-only table dashboard)"
+        );
     }
 }

@@ -18,13 +18,11 @@ In a busy dhaba serving hundreds of customers, accumulated floating-point roundi
 3. Rounding disputes with customers and tax authorities.
 
 ### The Integer Paise Representation
-Every currency amount is modeled as an unsigned 64-bit integer (`u64`) representing **paise** ($1\text{ Rupee} = 100\text{ paise}$):
+Every currency amount is modeled as an integer representing **paise** ($1\text{ Rupee} = 100\text{ paise}$):
 
 ```rust
 // 100 paise = ₹1.00
-pub type Paise = u64;
-
-pub fn format_paise(paise: Paise) -> String {
+pub fn format_paise(paise: u32) -> String {
     let rupees = paise / 100;
     let remainder = paise % 100;
     format!("₹{}.{:02}", rupees, remainder)
@@ -32,13 +30,18 @@ pub fn format_paise(paise: Paise) -> String {
 ```
 
 ### GST Calculation
-GST is calculated using integer multiplication and integer division with standard half-up rounding:
-$$\text{GST Paise} = \frac{\text{Taxable Paise} \times \text{Rate Percent} + 50}{100}$$
+CGST (2.5%) and SGST (2.5%) are calculated in `BillSummary::calculate()` using integer multiplication and integer division with standard half-up rounding:
+$$\text{Tax Paise} = \frac{\text{Subtotal Paise} \times 25 + 500}{1000}$$
 
 ```rust
-pub fn calculate_gst(taxable_paise: u64, gst_percent: u64) -> u64 {
-    (taxable_paise * gst_percent + 50) / 100
-}
+// 2.5% tax: (subtotal * 25 + 500) / 1000 for standard half-up rounding
+let cgst = if subtotal > 0 {
+    (subtotal.saturating_mul(25) + 500) / 1000
+} else {
+    0
+};
+let sgst = cgst;
+let total = subtotal.saturating_add(cgst).saturating_add(sgst);
 ```
 
 ---

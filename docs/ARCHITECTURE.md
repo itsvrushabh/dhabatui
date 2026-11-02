@@ -115,7 +115,7 @@ When the cashier presses `p` to settle an order:
 Writing logs to `stdout` or `stderr` corrupts the screen when Ratatui alternate screen and Crossterm raw mode are active. 
 
 DhabaTUI isolates all runtime logging using `tracing` and `tracing-appender`:
-- **Log Target**: [`dhabatui.log`](file:///home/cachyos/Work/dhabatui/dhabatui.log)
+- **Log Target**: `dhabatui.log`
 - **Appender**: Non-blocking rolling file appender on a dedicated thread.
 - **Worker Guard**: Initialized in `main.rs` and dropped only on clean exit to guarantee all queued logs flush to disk.
 
