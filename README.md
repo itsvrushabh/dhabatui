@@ -77,6 +77,34 @@ Right-click the downloaded file and select **Extract All** (or uncompress).
 
 ---
 
+## ⚙️ Configuration (`dhabatui.toml`)
+
+Customize your dhaba's name, receipt branding, custom tables, tax rates, and web server by placing `dhabatui.toml` in your working directory or `~/.config/dhabatui/config.toml`:
+
+```toml
+[dhaba]
+name = "SHER-E-PUNJAB DHABA"
+tagline = "Taste of Highway • Desi Ghee Swad!"
+address = "GT Road, Near Mile 142, Ambala"
+phone = "+91 98765 43210"
+gstin = "06AAAAA0000A1Z5"
+
+[tax]
+enable_gst = true
+cgst_rate_permille = 25  # 2.5% CGST
+sgst_rate_permille = 25  # 2.5% SGST
+
+[tables]
+count = 8
+# custom_labels = ["Khat 1", "Khat 2", "Family AC", "Garden 1"]
+
+[web]
+enabled = true
+port = 8080
+```
+
+---
+
 ## 📚 Complete Guides & Documentation
 
 * 🌐 **[Official Website](https://itsvrushabh.github.io/dhabatui/)**: Visual guides and downloads.

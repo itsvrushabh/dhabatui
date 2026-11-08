@@ -1,0 +1,24 @@
+# DhabaTUI Configuration File (dhabatui.toml)
+# Copy to ./dhabatui.toml or ~/.config/dhabatui/config.toml to customize your counter!
+
+[dhaba]
+name = "SHER-E-PUNJAB DHABA"
+tagline = "Taste of Highway • Desi Ghee Swad!"
+address = "GT Road, Near Mile 142, Ambala"
+phone = "+91 98765 43210"
+gstin = "06AAAAA0000A1Z5"
+
+[tax]
+enable_gst = true
+# Tax rate in permille (25 = 2.5% CGST and 2.5% SGST)
+cgst_rate_permille = 25
+sgst_rate_permille = 25
+
+[tables]
+count = 8
+# Optional custom table labels (e.g. Khat 1, Garden Table, AC Hall)
+# custom_labels = ["Khat 1", "Khat 2", "Family 1", "Family 2", "Garden A", "Garden B"]
+
+[web]
+enabled = true
+port = 8080

@@ -151,6 +151,15 @@ impl TableOrder {
         BillSummary::calculate(&self.items)
     }
 
+    pub fn summary_with_tax(
+        &self,
+        enable_gst: bool,
+        cgst_permille: u32,
+        sgst_permille: u32,
+    ) -> BillSummary {
+        BillSummary::calculate_with_tax(&self.items, enable_gst, cgst_permille, sgst_permille)
+    }
+
     pub fn is_empty(&self) -> bool {
         self.items.is_empty()
     }
@@ -173,9 +182,18 @@ pub struct BillSummary {
 }
 
 impl BillSummary {
-    /// Computes financial breakdown from a slice of cart items.
-    /// CGST is 2.5% and SGST is 2.5%, rounded to the nearest paise.
+    /// Computes financial breakdown from a slice of cart items with default 5% GST.
     pub fn calculate(items: &[CartItem]) -> Self {
+        Self::calculate_with_tax(items, true, 25, 25)
+    }
+
+    /// Computes financial breakdown with configurable tax rates.
+    pub fn calculate_with_tax(
+        items: &[CartItem],
+        enable_gst: bool,
+        cgst_permille: u32,
+        sgst_permille: u32,
+    ) -> Self {
         let mut subtotal: u64 = 0;
         let mut total_items: u64 = 0;
 
@@ -184,15 +202,14 @@ impl BillSummary {
             total_items = total_items.saturating_add(item.quantity as u64);
         }
 
-        // 2.5% tax: (subtotal * 25 + 500) / 1000 for standard half-up rounding
-        let cgst = if subtotal > 0 {
-            (subtotal.saturating_mul(25) + 500) / 1000
+        let cgst = if enable_gst && subtotal > 0 && cgst_permille > 0 {
+            (subtotal.saturating_mul(cgst_permille as u64) + 500) / 1000
         } else {
             0
         };
 
-        let sgst = if subtotal > 0 {
-            (subtotal.saturating_mul(25) + 500) / 1000
+        let sgst = if enable_gst && subtotal > 0 && sgst_permille > 0 {
+            (subtotal.saturating_mul(sgst_permille as u64) + 500) / 1000
         } else {
             0
         };

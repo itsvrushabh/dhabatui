@@ -43,14 +43,14 @@ pub fn render(f: &mut Frame, app: &mut App) {
 fn render_header(f: &mut Frame, app: &App, area: Rect) {
     let mut spans = vec![
         Span::styled(
-            " 🍲 DHABA TUI ",
+            format!(" 🍲 {} ", app.config.dhaba.name),
             Style::default()
                 .fg(Color::Black)
                 .bg(Color::Yellow)
                 .add_modifier(Modifier::BOLD),
         ),
         Span::styled(
-            "  Smart POS & Billing System",
+            format!("  {}", app.config.dhaba.tagline),
             Style::default()
                 .fg(Color::Cyan)
                 .add_modifier(Modifier::BOLD),
