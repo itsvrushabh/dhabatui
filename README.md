@@ -64,6 +64,8 @@ Right-click the downloaded file and select **Extract All** (or uncompress).
 | <kbd>t</kbd> / <kbd>T</kbd> | Cycle Tables (`T1` to `T8`, Parcel) | When guests sit at a new table |
 | <kbd>s</kbd> | Change Table Status | Cycle status: `Vacant` ➔ `Ordering` ➔ `Served` ➔ `Billed` ➔ `Ordering` (resets on settle <kbd>p</kbd> or clear <kbd>c</kbd>) |
 | <kbd>Tab</kbd> | Switch Focus (Menu ⟷ Cart) | To browse dishes or adjust order lines |
+| <kbd>/</kbd> | Search Dishes in Real-Time | Type dish name or code to filter menu |
+| <kbd>f</kbd> / <kbd>F</kbd> | Filter by Category | Cycle Mains ➔ Breads ➔ Rice ➔ Making ➔ Drinks |
 | <kbd>0</kbd>–<kbd>9</kbd> + <kbd>Enter</kbd> | Quick Dish Number (e.g. `101`) | To punch items in 1 second |
 | <kbd>+</kbd> / <kbd>-</kbd> | Increase / Decrease item count | When guests order extra rotis |
 | <kbd>m</kbd> | Customer Cooking Fee (*Banwai*) | For customer-brought raw meat preparation |

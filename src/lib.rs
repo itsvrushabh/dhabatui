@@ -141,6 +141,15 @@ fn run_app<B: ratatui::backend::Backend>(
                         KeyCode::Char('p') | KeyCode::Char('P') => {
                             let _ = app.settle_and_print();
                         }
+                        KeyCode::Char('/') => {
+                            app.input_mode = InputMode::SearchingMenu;
+                            app.active_pane = ActivePane::Menu;
+                            app.search_query.clear();
+                            app.reset_menu_selection();
+                        }
+                        KeyCode::Char('f') | KeyCode::Char('F') => {
+                            app.cycle_category();
+                        }
                         KeyCode::Char(c) if c.is_ascii_digit() => {
                             app.input_mode = InputMode::QuickCode;
                             app.quick_code_buffer.clear();
@@ -167,6 +176,33 @@ fn run_app<B: ratatui::backend::Backend>(
                             let code = std::mem::take(&mut app.quick_code_buffer);
                             app.add_item_by_code(&code);
                             app.input_mode = InputMode::Normal;
+                        }
+                        _ => {}
+                    },
+
+                    InputMode::SearchingMenu => match key.code {
+                        KeyCode::Esc => {
+                            app.search_query.clear();
+                            app.reset_menu_selection();
+                            app.input_mode = InputMode::Normal;
+                        }
+                        KeyCode::Enter => {
+                            app.add_selected_menu_item();
+                            app.input_mode = InputMode::Normal;
+                        }
+                        KeyCode::Down | KeyCode::Tab => {
+                            app.next_item();
+                        }
+                        KeyCode::Up | KeyCode::BackTab => {
+                            app.previous_item();
+                        }
+                        KeyCode::Backspace => {
+                            app.search_query.pop();
+                            app.reset_menu_selection();
+                        }
+                        KeyCode::Char(c) => {
+                            app.search_query.push(c);
+                            app.reset_menu_selection();
                         }
                         _ => {}
                     },
