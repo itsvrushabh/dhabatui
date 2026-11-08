@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
@@ -14,6 +21,7 @@ jobs:
   test:
     name: Test & Lint
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -35,12 +43,21 @@ jobs:
       - name: Run all tests
         run: cargo test --all-targets
 
+      - name: Validate documentation website & license
+        run: |
+          test -f site/index.html
+          test -f site/styles.css
+          test -f LICENSE
+          cmp assets/cashier_flow.svg site/assets/cashier_flow.svg
+          cmp assets/screenshot.svg site/assets/screenshot.svg
+
       - name: Build release binary
         run: cargo build --release --locked
 
   cross-platform:
     name: Build on ${{ matrix.os }}
     needs: test
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -55,6 +72,9 @@ jobs:
 
       - name: Enable Rust caching
         uses: Swatinem/rust-cache@v2
+
+      - name: Run tests
+        run: cargo test --release --locked --all-targets
 
       - name: Build release
         run: cargo build --release --locked

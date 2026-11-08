@@ -7,14 +7,23 @@ on:
       - 'mobile/ios/**'
       - '.github/workflows/ios.yml'
   pull_request:
+    branches: [main]
     paths:
       - 'mobile/ios/**'
       - '.github/workflows/ios.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     name: Build iOS App
     runs-on: macos-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository

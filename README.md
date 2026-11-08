@@ -1,129 +1,91 @@
 # 🍲 DhabaTUI
 
 [![CI](https://github.com/itsvrushabh/dhabatui/actions/workflows/ci.yml/badge.svg)](https://github.com/itsvrushabh/dhabatui/actions/workflows/ci.yml)
-[![Rust](https://img.shields.io/badge/Rust-2021_Edition-orange?logo=rust)](https://www.rust-lang.org/)
-[![TUI](https://img.shields.io/badge/TUI-Ratatui_0.29-blue)](https://github.com/ratatui-org/ratatui)
-[![Database](https://img.shields.io/badge/Database-redb_2.x_ACID-teal)](https://github.com/cberner/redb)
+[![Website](https://img.shields.io/badge/Website-itsvrushabh.github.io%2Fdhabatui-amber?logo=googlechrome)](https://itsvrushabh.github.io/dhabatui/)
+[![Release](https://img.shields.io/github/v/release/itsvrushabh/dhabatui?color=blue&label=Release)](https://github.com/itsvrushabh/dhabatui/releases)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-A lightning-fast, keyboard-driven Terminal User Interface (TUI) Point-of-Sale (POS) and billing application built specifically for Indian dhabas, roadside eateries, and small-scale restaurants.
+**Fast, 100% offline POS and billing software designed specifically for Indian dhabas, roadside eateries, tea stalls, and casual restaurants.**
+
+👉 **[Visit the Official Website & User Guide](https://itsvrushabh.github.io/dhabatui/)**
 
 ---
 
-## 🖥️ Live Terminal Interface
+## 💡 What is DhabaTUI? (In Plain English)
+
+DhabaTUI is a lightweight cash register and billing application built for busy counter staff. It runs completely offline on any regular computer or laptop — meaning **you never lose a bill during power cuts or internet outages**.
+
+Instead of struggling with a slow mouse or complex cloud software during lunch and dinner rush hours, cashiers can punch a full table's order and settle an itemized bill (saved to `receipt.txt`) in **under 5 seconds** using simple keyboard shortcuts.
+
+---
+
+## 🌟 Why Dhaba Owners Love It
+
+- 🔌 **100% Offline**: No internet or cloud subscription needed. Everything runs locally on your counter computer.
+- 💰 **Exact Paise Accuracy**: Uses zero-float integer math (`100 paise = ₹1.00`). Eliminates computer rounding drift so your cash drawer balances to the single rupee every night.
+- ⚡ **Ultra-Fast Keyboard Entry**: Memorize dish codes (like `101` for Dal Tadka) and add items in milliseconds.
+- 🪑 **8 Tables + Parcel Orders**: Switch between Dining Tables (`T1`–`T8`) and takeaway parcels with the <kbd>t</kbd> key. Focus menu/cart with <kbd>Tab</kbd>.
+- 🥩 **Customer Meat Cooking (*Banwai*)**: Easily add custom meat preparation charges on the fly when guests bring their own raw chicken or mutton.
+- 📱 **Mobile View for Waiters & Kitchen**: Kitchen staff and waiters can open their phone browser on your dhaba's local Wi-Fi to view active table orders in real-time.
+
+---
+
+## 🖥️ What It Looks Like
 
 ![DhabaTUI Screenshot](assets/screenshot.svg)
 
-```text
-┌─ 🍲 DHABA TUI   Smart POS & Billing System ────────────────────────────────────────────────────────┐
-└────────────────────────────────────────────────────────────────────────────────────────────────────┘
-┌─ Dining Tables & Takeaway (Press 't' to cycle, 's' to toggle status) ──────────────────────────────┐
-│ Tables: ▶[T1: ₹640.50 (Ordering)]◀  [T2]  [T3]  [T4]  [T5]  [T6]  [T7]  [T8]  [Parcel]         │
-└────────────────────────────────────────────────────────────────────────────────────────────────────┘
-┌─ [1] Menu Catalog ▶ (Enter: Add | Digits: Quick Code) ──┬─ [2] Order: Table 1 [Ordering] ▶ ────────┐
-│ Code  Item Name             Category       Price        │ Code  Item Name                 Qty Total│
-│ ▶ 101 Dal Tadka             Mains        ₹130.00        │ [CUST]* 1/2kg Mutton Masala (M)   1 ₹180 │
-│   102 Dal Makhani           Mains        ₹160.00        │ [CUST]* 1/2kg Mutton Fry (Making) 1 ₹160 │
-│   103 Paneer Butter Masala  Mains        ₹210.00        │ [201] Tandoori Roti               6  ₹90 │
-│   201 Tandoori Roti         Breads        ₹15.00        │ [302] Jeera Rice                  1 ₹120 │
-│   202 Butter Naan           Breads        ₹45.00        │ [502] Chaas / Buttermilk          2  ₹60 │
-│   401 Mutton Making (1/2kg) Making Chg   ₹180.00        ├──────────────────────────────────────────┤
-│   402 Mutton Making (1 kg)  Making Chg   ₹320.00        │ Total Items: 11 (5 lines)  Subtotal: ₹610│
-│   501 Sweet Lassi           Beverages     ₹60.00        │                            CGST:   ₹15.25│
-│   502 Chaas / Buttermilk    Beverages     ₹30.00        │                            SGST:   ₹15.25│
-│                                                         │                            TOTAL: ₹640.50│
-├─────────────────────────────────────────────────────────┴──────────────────────────────────────────┤
-│ ✓ Bill #101 settled for Table 1 (₹640.50)! Saved to receipt.txt                                   │
-├────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ t:Table | s:Status | Tab:Pane | Enter:Add | +/-:Qty | e:Edit Price | m:Making Chg | p:Settle | q:Quit│
-└────────────────────────────────────────────────────────────────────────────────────────────────────┘
-```
+---
+
+## 🚀 Get Started in 3 Steps (No Coding Required)
+
+### 1. Download for Your Computer
+Download the ready-to-run package from our **[Latest Release](https://github.com/itsvrushabh/dhabatui/releases/latest)**:
+
+* 🪟 **Windows**: [Download `.zip`](https://github.com/itsvrushabh/dhabatui/releases/latest) (Works on Windows 10 & 11)
+* 🍏 **Mac (Apple Silicon M1/M2/M3/M4)**: [Download `.tar.gz`](https://github.com/itsvrushabh/dhabatui/releases/latest) *(Note: On first launch, right-click and choose "Open" if prompted by Gatekeeper)*
+* 🍏 **Mac (Intel)**: [Download `.tar.gz`](https://github.com/itsvrushabh/dhabatui/releases/latest) *(Note: On first launch, right-click and choose "Open" if prompted by Gatekeeper)*
+* 🐧 **Linux**: [Download `.tar.gz`](https://github.com/itsvrushabh/dhabatui/releases/latest)
+
+### 2. Extract the Folder
+Right-click the downloaded file and select **Extract All** (or uncompress).
+
+### 3. Open and Start Billing!
+* **Windows**: Double-click `dti.exe`
+* **Mac & Linux**: Open terminal and run `./dti`
+
+*(Are you a Rust developer? You can also install via Cargo: `cargo install dhabatui`)*
 
 ---
 
-## 📦 Installation & Download
+## ⌨️ Common Cashier Shortcuts
 
-### Option 1: Pre-Built Release Binaries (Recommended — No Rust Required)
-Download the ready-to-run binary package for your operating system from **[GitHub Releases](https://github.com/itsvrushabh/dhabatui/releases)**:
-
-| Platform | Download Package | Format | How to Run |
-| :--- | :--- | :--- | :--- |
-| 🐧 **Linux (x86_64)** | `dhabatui-v*-x86_64-unknown-linux-gnu.tar.gz` | `.tar.gz` archive | Extract and run `./dti` or `./dhabatui` |
-| 🪟 **Windows (x86_64)** | `dhabatui-v*-x86_64-pc-windows-msvc.zip` | `.zip` archive | Extract and double-click / run `dti.exe` |
-| 🍏 **macOS Apple Silicon (M1/M2/M3/M4)** | `dhabatui-v*-aarch64-apple-darwin.tar.gz` | `.tar.gz` archive | Extract and run `./dti` or `./dhabatui` |
-| 🍏 **macOS Intel (x86_64)** | `dhabatui-v*-x86_64-apple-darwin.tar.gz` | `.tar.gz` archive | Extract and run `./dti` or `./dhabatui` |
-
-*Every package contains both the full `dhabatui` binary and the fast `dti` alias.*
-
-### Option 2: Install via Cargo
-If you have the Rust toolchain installed, install directly from [crates.io](https://crates.io/crates/dhabatui):
-```bash
-cargo install dhabatui
-# or install latest from git
-cargo install --git https://github.com/itsvrushabh/dhabatui.git
-```
-*(Automatically places both `dti` and `dhabatui` executables into your `~/.cargo/bin/`).*
+| Key | What It Does | When to Use |
+| :---: | :--- | :--- |
+| <kbd>t</kbd> / <kbd>T</kbd> | Cycle Tables (`T1` to `T8`, Parcel) | When guests sit at a new table |
+| <kbd>s</kbd> | Change Table Status | Cycle status: `Vacant` ➔ `Ordering` ➔ `Served` ➔ `Billed` ➔ `Ordering` (resets on settle <kbd>p</kbd> or clear <kbd>c</kbd>) |
+| <kbd>Tab</kbd> | Switch Focus (Menu ⟷ Cart) | To browse dishes or adjust order lines |
+| <kbd>0</kbd>–<kbd>9</kbd> + <kbd>Enter</kbd> | Quick Dish Number (e.g. `101`) | To punch items in 1 second |
+| <kbd>+</kbd> / <kbd>-</kbd> | Increase / Decrease item count | When guests order extra rotis |
+| <kbd>m</kbd> | Customer Cooking Fee (*Banwai*) | For customer-brought raw meat preparation |
+| <kbd>e</kbd> | Change Price On-the-Fly | To adjust price or give discount |
+| <kbd>p</kbd> | Settle Bill & Save Receipt | Finalize order and save to `receipt.txt` |
+| <kbd>q</kbd> / <kbd>Esc</kbd> | Close Window / Exit | To close any popup safely |
 
 ---
 
-## ⚡ Quick Start
+## 📚 Complete Guides & Documentation
 
-Once downloaded or installed, launch DhabaTUI directly from any terminal:
-
-```bash
-dti
-# or
-dhabatui
-```
-
----
-
-## 🌟 Key Features
-
-- **⚡ Zero-Mouse Keyboard Speed**: Designed so cashiers never need to reach for a mouse during peak rush hours.
-- **🪑 Multi-Table Management**: Live tracking across **8 Dining Tables** (`T1`–`T8`) plus **Parcel Takeaway** with independent carts and statuses (`Vacant`, `Ordering`, `Served`, `Billed`).
-- **🥩 Customer Meat Cooking Charges (*Banwai*)**: Highway dhabas frequently cook raw meat brought by customers. Press <kbd>m</kbd> to add custom cooking descriptions and prices on the fly.
-- **✏️ On-The-Fly Price Alteration**: Press <kbd>e</kbd> to negotiate or adjust dish prices for bulk orders without touching the permanent menu catalog.
-- **🔢 Numeric Quick-Code Entry**: Cashiers who memorize dish codes (e.g. `101`) can type numbers directly to add dishes in milliseconds.
-- **💾 Embedded ACID Database (`redb`)**: Single-file embedded storage (`dhabatui.redb`) guarantees zero database corruption even during abrupt power cuts.
-- **🧾 ESC/POS 80mm Receipt Printing**: Instant settlement commits to disk and formats itemized bills to [`receipt.txt`](receipt.txt).
-
----
-
-## ⌨️ Common Shortcuts Cheat Sheet
-
-| Shortcut | Description |
-| :--- | :--- |
-| **`t`** / **`T`** / **`Shift+Tab`** | Cycle active dining table |
-| **`s`** / **`S`** | Cycle table status (`Vacant` ➔ `Ordering` ➔ `Served` ➔ `Billed`) |
-| **`Tab`** / **`h`** / **`l`** | Switch focus between Menu Catalog and Order Cart |
-| **`0`–`9`** + **`Enter`** | Rapid numeric dish code entry (e.g. `101` + `Enter`) |
-| **`Enter`** | Add highlighted catalog dish to active table |
-| **`+`** / **`-`** | Increment or decrement item quantity |
-| **`m`** | **Making Charges (*Banwai*)**: Add custom meat preparation |
-| **`e`** | **Alter Price**: Override unit price for active dish |
-| **`p`** | **Settle Bill**: Commit to `redb`, generate receipt, and clear table |
-| **`q`** / **`Esc`** | Exit DhabaTUI or close popup modal |
-
----
-
-## 📚 Complete Documentation & Project Wiki
-
-All detailed operating guides, release specifications, architecture designs, and reference documentation are available in the repository docs and official Wiki:
-
-- 📖 **[Project Wiki](https://github.com/itsvrushabh/dhabatui/wiki)** (or local [`wiki/`](wiki/)): Complete knowledge base for cashiers, developers, and administrators.
-- 🗓️ **[Release Cycle & Cadence](docs/RELEASE_CYCLE.md)**: Yearly LTS, Monthly Minor, and Weekly Patch release policies, support matrix, and automation.
-- 📜 **[Changelog & Release Notes](CHANGELOG.md)**: Historical version release notes and upcoming changes.
-- 📖 **[Cashier's Guide & Workflow](docs/CASHIER_GUIDE.md)**: Full visual cashier guide with 4-step workflow, table management, making charges (*banwai*), and receipt samples.
-- 🌐 **[Live Web Dashboard (LAN Only)](docs/WEB_DASHBOARD.md)**: Embedded read-only kitchen and waitstaff monitor over private Wi-Fi networks.
-- 🏗️ **[System Architecture](docs/ARCHITECTURE.md)**: Embedded `redb` storage engine, multi-table domain, and thread architecture.
-- 💰 **[Financials & GST Math](docs/FINANCIALS.md)**: Integer paise representation and exact half-up rounding for 2.5% CGST + 2.5% SGST.
-- 🛠️ **[Developer & Testing Guide](docs/DEVELOPMENT.md)**: Building, test suite, and CI/CD pipelines.
-- 🤖 **[PR-Agent Automated Reviews](docs/PR_AGENT_GUIDE.md)**: AI-driven automated pull request analysis and review workflow.
-- ⚡ **[OpenCode Code Reviews](docs/OPENCODE_GUIDE.md)**: Interactive AI coding agent and automated PR reviews with OIDC console authentication.
+* 🌐 **[Official Website](https://itsvrushabh.github.io/dhabatui/)**: Visual guides and downloads.
+* 📖 **[Project Wiki](https://github.com/itsvrushabh/dhabatui/wiki)** (or local [`wiki/`](wiki/)): Full knowledge base and operations manual.
+* 👨‍🍳 **[Cashier's Visual Guide](docs/CASHIER_GUIDE.md)**: Visual 4-step workflow for counter staff.
+* 📱 **[LAN Mobile Dashboard](docs/WEB_DASHBOARD.md)**: How to view orders on mobile phones over local Wi-Fi.
+* 💰 **[Financials & Zero-Float Invariant](docs/FINANCIALS.md)**: Exact paise math and half-up GST rounding.
+* 🗓️ **[Release Cycle & Cadence](docs/RELEASE_CYCLE.md)**: Yearly LTS, Monthly Minor, and Weekly Patch schedules.
+* 📜 **[Changelog](CHANGELOG.md)**: Version history and updates.
+* 🛠️ **[Developer & Contribution Guide](docs/DEVELOPMENT.md)**: Compiling, testing, and architecture.
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+DhabaTUI is free and open-source software licensed under the [MIT License](LICENSE).

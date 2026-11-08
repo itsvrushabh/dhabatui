@@ -108,11 +108,11 @@ With the **Current Order** pane focused:
 
 ---
 
-### 8. Settle & Print Receipt
+### 8. Settle & Save Receipt
 When the customer is ready to pay:
 - Press **`p`** anywhere.
 - The active table's order is atomically committed to `redb` under a sequential invoice number (e.g. `#101`) tagged with the table ID.
-- The itemized bill is exported to [`receipt.txt`](../receipt.txt) for 80mm thermal ESC/POS printers and archived to `receipts/bill_<id>.txt`.
+- The itemized bill is exported to `receipt.txt` (formatted for standard 80mm receipt format) and archived to `receipts/bill_<id>.txt`.
 - The table resets to `Vacant` and a confirmation banner confirms settlement.
 
 ---
@@ -123,7 +123,7 @@ When the customer is ready to pay:
 | :--- | :--- | :--- |
 | **`t`** / **`T`** | Global | Cycle active table forward (`T1`..`T8`, `Parcel`) |
 | **`Shift+Tab`** | Global | Cycle active table backward |
-| **`s`** / **`S`** | Global | Toggle active table status (`Vacant` ➔ `Ordering` ➔ `Served` ➔ `Billed`) |
+| **`s`** / **`S`** | Global | Cycle table status: `Vacant` ➔ `Ordering` ➔ `Served` ➔ `Billed` ➔ `Ordering` (resets on settle `p` or clear `c`) |
 | **`Tab`** | Global | Toggle focus between **Menu Catalog** and **Current Table Order** |
 | **`h`** / **`Left`** | Global | Focus **Menu Catalog** |
 | **`l`** / **`Right`** | Global | Focus **Current Table Order** |
@@ -137,12 +137,12 @@ When the customer is ready to pay:
 | **`m`** / **`M`** | Global | **Add Custom / Making Charge**: modal for dish description & price |
 | **`d`** / **`D`** | Cart Pane | Delete selected item line from order |
 | **`c`** / **`C`** | Global | Clear active table's order |
-| **`p`** / **`P`** | Global | **Settle & Print**: commit to `redb`, write `receipt.txt`, and clear table |
+| **`p`** / **`P`** | Global | **Settle & Save**: commit to `redb`, write `receipt.txt`, and clear table |
 | **`q`** / **`Esc`** | Global | Cleanly exit DhabaTUI (or dismiss open popup modal) |
 
 ---
 
-## 🧾 Sample Printed Receipt (`receipt.txt`)
+## 🧾 Sample Saved Receipt (`receipt.txt`)
 
 ```text
 ============================================================

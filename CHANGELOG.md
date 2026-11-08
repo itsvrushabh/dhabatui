@@ -61,13 +61,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Official Crates.io Deployment**: First published release on crates.io (`cargo install dhabatui`).
 - **Terminal POS User Interface**: Ratatui-based keyboard-first interface for fast order punching.
-- **Zero-Float Financial Math**: Pure integer arithmetic in paise (`100 paise = ₹1.00`) with zero rounding errors.
-- **Multi-Table Management**: Track up to 10 dining tables concurrently with status indicators (Vacant, Occupied, Billed).
-- **Kitchen Order Tickets (KOT)**: Print and track kitchen tickets with incremental item counts.
-- **Bill History & Receipts**: View, search, and reprint past finalized receipts.
-- **Day-End Shift Closure**: Daily sales summary, GST reports, and cash vs UPI breakdown.
+- **Zero-Float Financial Math**: Pure integer arithmetic in paise (`100 paise = ₹1.00`) with half-up GST rounding.
+- **Multi-Table Management**: Track up to 8 dining tables plus takeaway parcels concurrently with status indicators.
+- **Atomic Receipt Saving**: Atomically commit orders to `redb` and export plain-text receipts to `receipt.txt`.
 - **Local LAN HTTP Server**: Built-in HTTP server (`tiny_http`) serving mobile-friendly web dashboard at `http://<LAN-IP>:8080`.
-- **Diagnostic Tool (`dti`)**: Companion CLI binary for inspecting database, menu, and server status.
+- **Rapid Command Alias (`dti`)**: Fast 3-letter binary alias for instant terminal POS launching.
 - **Cross-Platform Release Binaries**: Pre-compiled binaries for Linux, macOS (Apple Silicon & Intel), and Windows.
 
 ---

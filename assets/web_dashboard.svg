@@ -45,7 +45,7 @@
   <text x="45" y="162" class="text-metric">3 / 9 Tables</text>
 
   <rect x="295" y="112" width="245" height="64" class="stat-box"/>
-  <text x="310" y="134" class="text-sub">KITCHEN QUEUE ITEMS</text>
+  <text x="310" y="134" class="text-sub">ACTIVE ORDER ITEMS</text>
   <text x="310" y="162" class="text-metric">18 Dishes</text>
 
   <rect x="560" y="112" width="245" height="64" class="stat-box"/>
@@ -138,7 +138,7 @@
   <!-- Bottom Panel: Recent Bills -->
   <rect x="30" y="550" width="1040" height="106" class="card-bg"/>
   <text x="46" y="575" class="text-title" font-size="14">🧾 Recent Settled Bills (Archived in redb &amp; receipt.txt)</text>
-  <text x="46" y="605" class="text-item">#103  •  Table 1  •  2026-11-01 14:15:10  •  5 items  •  ₹640.50 (Settled &amp; Printed)</text>
-  <text x="46" y="628" class="text-item">#102  •  Parcel   •  2026-11-01 13:50:22  •  3 items  •  ₹385.00 (Settled &amp; Printed)</text>
-  <text x="46" y="650" class="text-item">#101  •  Table 3  •  2026-11-01 13:12:05  •  8 items  •  ₹720.00 (Settled &amp; Printed)</text>
+  <text x="46" y="605" class="text-item">#103  •  Table 1  •  2026-11-01 14:15:10  •  5 items  •  ₹640.50 (Settled &amp; Saved)</text>
+  <text x="46" y="628" class="text-item">#102  •  Parcel   •  2026-11-01 13:50:22  •  3 items  •  ₹385.00 (Settled &amp; Saved)</text>
+  <text x="46" y="650" class="text-item">#101  •  Table 3  •  2026-11-01 13:12:05  •  8 items  •  ₹720.00 (Settled &amp; Saved)</text>
 </svg>

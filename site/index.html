@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DhabaTUI — Fast, 100% Offline POS & Billing for Indian Dhabas</title>
+  <meta name="description" content="Simple, lightning-fast Terminal POS and billing software designed for Indian dhabas, tea stalls, and casual eateries. 100% offline, exact paise math and zero floating-point drift.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍲</text></svg>">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header>
+    <div class="container">
+      <nav>
+        <div class="nav-brand">
+          🍲 DhabaTUI <span class="badge">v0.1.2</span>
+        </div>
+        <ul class="nav-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#downloads">Download</a></li>
+          <li><a href="#shortcuts">Shortcuts</a></li>
+          <li><a href="https://github.com/itsvrushabh/dhabatui/wiki" target="_blank" rel="noopener">Wiki</a></li>
+          <li><a href="https://github.com/itsvrushabh/dhabatui" target="_blank" rel="noopener" class="btn btn-secondary">GitHub</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-pill">⚡ Made for Highway Dhabas & Eateries</div>
+      <h1>Fast, 100% Offline Billing <br><span class="gradient-text">Accurate to the Single Paisa</span></h1>
+      <p class="lead">
+        Never let power cuts, slow internet, or complicated software stall your cash counter.
+        DhabaTUI is a lightweight billing app cashiers can operate with just their keyboard in under 5 seconds.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#downloads" class="btn btn-primary">⬇️ Download Free for Your Computer</a>
+        <a href="#how-it-works" class="btn btn-secondary">📖 See How It Works</a>
+      </div>
+
+      <div class="hero-image-wrapper">
+        <img src="assets/screenshot.svg" alt="DhabaTUI Live Terminal Interface Screenshot">
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Benefits (Why Dhaba Owners Love It) -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-title">
+        <h2>Why Dhaba & Restaurant Owners Love DhabaTUI</h2>
+        <p>Built from the ground up to solve the real everyday frustrations of roadside restaurants.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <span class="feature-icon">🔌</span>
+          <h3>Works 100% Offline</h3>
+          <p>No internet connection needed. No cloud subscriptions. If your Wi-Fi or broadband drops, your counter keeps billing without skipping a beat.</p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-icon">💰</span>
+          <h3>Exact Integer Paise Math (Zero Floating-Point Drift)</h3>
+          <p>All calculations use exact integer Indian Paise (100 paise = ₹1.00) with half-up GST rounding. Eliminates computer floating-point drift so your cash drawer balances to the single rupee every night.</p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-icon">⚡</span>
+          <h3>Lightning-Fast Keyboard Entry</h3>
+          <p>No mouse required. Cashiers memorize dish codes (like 101 for Dal Tadka) and punch an entire family order in under 5 seconds.</p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-icon">🪑</span>
+          <h3>8 Tables & Parcel Orders</h3>
+          <p>Instantly switch between 8 dining tables plus takeaway parcels with the <kbd>t</kbd> key. Switch focus between menu and cart with <kbd>Tab</kbd>. See occupied, vacant, and billed tables at a glance.</p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-icon">🥩</span>
+          <h3>Customer Meat Cooking (Banwai)</h3>
+          <p>Highway dhabas often cook raw meat brought by guests. Easily punch on-the-fly custom cooking fees (e.g. 1/2kg Mutton Masala) with one button.</p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-icon">📱</span>
+          <h3>Mobile Phone / Tablet View</h3>
+          <p>Kitchen staff and waiters can open their phone browser on your dhaba's local Wi-Fi to view active table orders in real-time.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3-Step Setup for Non-Developers -->
+  <section class="section setup-section" id="how-it-works">
+    <div class="container">
+      <div class="section-title">
+        <h2>Get Started in 3 Simple Steps</h2>
+        <p>No programming knowledge or complicated database setup required.</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h3>Download the App</h3>
+          <p>Download the pre-built application package for your operating system (Windows, Mac, or Linux) from our downloads section.</p>
+          <div class="code-box">Downloads available below ↓</div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h3>Extract the Folder</h3>
+          <p>Unzip the downloaded file onto your desktop or cash counter computer. No installers or drivers needed.</p>
+          <div class="code-box">Right-click ➔ Extract All</div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h3>Double-Click & Bill</h3>
+          <p>Double-click <code>dti.exe</code> (Windows) or run <code>./dti</code> (Mac/Linux). The counter opens instantly and is ready for business.</p>
+          <div class="code-box">Instant start in &lt; 1 second</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Visual Cashier Flow -->
+  <section class="section">
+    <div class="container">
+      <div class="section-title">
+        <h2>Visual Cashier Workflow</h2>
+        <p>A simple 4-step flow designed so any counter staff can master it in 5 minutes.</p>
+      </div>
+
+      <div class="hero-image-wrapper">
+        <img src="assets/cashier_flow.svg" alt="Visual Cashier 4-Step Workflow">
+      </div>
+    </div>
+  </section>
+
+  <!-- Downloads Section -->
+  <section class="section" id="downloads">
+    <div class="container">
+      <div class="section-title">
+        <h2>Download DhabaTUI for Free</h2>
+        <p>Choose your operating system. Free and open source under the MIT License.</p>
+      </div>
+
+      <div class="downloads-grid">
+        <div class="download-card">
+          <div class="download-os-icon">🪟</div>
+          <h3>Windows (64-bit)</h3>
+          <p>Compatible with Windows 10, 11, and POS terminals.</p>
+          <a href="https://github.com/itsvrushabh/dhabatui/releases/latest" class="btn btn-primary" target="_blank" rel="noopener">Download .zip</a>
+        </div>
+
+        <div class="download-card">
+          <div class="download-os-icon">🍏</div>
+          <h3>macOS (Apple Silicon)</h3>
+          <p>Optimized for M1, M2, M3, and M4 Macs.</p>
+          <a href="https://github.com/itsvrushabh/dhabatui/releases/latest" class="btn btn-primary" target="_blank" rel="noopener">Download .tar.gz</a>
+        </div>
+
+        <div class="download-card">
+          <div class="download-os-icon">🍏</div>
+          <h3>macOS (Intel x86)</h3>
+          <p>Compatible with Intel-based MacBook & iMacs.</p>
+          <a href="https://github.com/itsvrushabh/dhabatui/releases/latest" class="btn btn-primary" target="_blank" rel="noopener">Download .tar.gz</a>
+        </div>
+
+        <div class="download-card">
+          <div class="download-os-icon">🐧</div>
+          <h3>Linux (x86_64)</h3>
+          <p>For Ubuntu, Debian, Arch, and POS Linux setups.</p>
+          <a href="https://github.com/itsvrushabh/dhabatui/releases/latest" class="btn btn-primary" target="_blank" rel="noopener">Download .tar.gz</a>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 1.5rem;">
+        <p style="color: var(--text-muted); font-size: 0.85rem; max-width: 650px; margin: 0 auto;">
+          <em>Note for macOS:</em> Because binaries are distributed directly, right-click and choose &ldquo;Open&rdquo; on first launch if prompted by macOS Gatekeeper.
+        </p>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.75rem;">
+          Are you a Rust developer? You can also install via Cargo: <code>cargo install dhabatui</code>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Keyboard Shortcuts Cheat Sheet -->
+  <section class="section" id="shortcuts">
+    <div class="container">
+      <div class="section-title">
+        <h2>Cashier Keyboard Shortcuts</h2>
+        <p>Keep these shortcuts beside your counter screen for super-fast order entry.</p>
+      </div>
+
+      <table class="shortcuts-table">
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Action</th>
+            <th>When to Use</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><kbd>t</kbd> / <kbd>T</kbd></td>
+            <td>Cycle Tables (T1 to T8, Parcel)</td>
+            <td>When guests sit at a new table or order takeaway</td>
+          </tr>
+          <tr>
+            <td><kbd>s</kbd></td>
+            <td>Change Table Status</td>
+            <td>Cycle status: Vacant ➔ Ordering ➔ Served ➔ Billed ➔ Ordering (resets on settle <kbd>p</kbd> or clear <kbd>c</kbd>)</td>
+          </tr>
+          <tr>
+            <td><kbd>Tab</kbd></td>
+            <td>Switch Focus (Menu ⟷ Cart)</td>
+            <td>To browse dishes or adjust order lines</td>
+          </tr>
+          <tr>
+            <td><kbd>0</kbd>–<kbd>9</kbd> + <kbd>Enter</kbd></td>
+            <td>Quick Item Code Entry (e.g. <code>101</code>)</td>
+            <td>To add dishes in 1 second by their 3-digit menu number</td>
+          </tr>
+          <tr>
+            <td><kbd>+</kbd> / <kbd>-</kbd></td>
+            <td>Increase or decrease dish quantity</td>
+            <td>When customer asks for extra roti or cancels an item</td>
+          </tr>
+          <tr>
+            <td><kbd>m</kbd></td>
+            <td>Custom Meat Cooking Fee (Banwai)</td>
+            <td>When customer brings raw mutton/chicken to be cooked</td>
+          </tr>
+          <tr>
+            <td><kbd>e</kbd></td>
+            <td>Change Dish Price On-the-Fly</td>
+            <td>To negotiate or apply bulk discounts for regular guests</td>
+          </tr>
+          <tr>
+            <td><kbd>p</kbd></td>
+            <td>Settle Bill & Save Receipt</td>
+            <td>When guests ask for bill (saves to <code>receipt.txt</code>)</td>
+          </tr>
+          <tr>
+            <td><kbd>q</kbd> / <kbd>Esc</kbd></td>
+            <td>Close Window or Exit</td>
+            <td>To close any popup or exit the app safely</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div>
+          <strong>🍲 DhabaTUI</strong> — Fast, offline terminal POS for Indian dhabas.
+          <p style="color: var(--text-muted); margin-top: 0.25rem;">Free & Open Source under the MIT License.</p>
+        </div>
+        <div style="display: flex; gap: 1.5rem;">
+          <a href="https://github.com/itsvrushabh/dhabatui" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/itsvrushabh/dhabatui/wiki" target="_blank" rel="noopener">Full Wiki</a>
+          <a href="https://crates.io/crates/dhabatui" target="_blank" rel="noopener">Crates.io</a>
+          <a href="https://github.com/itsvrushabh/dhabatui/releases" target="_blank" rel="noopener">Releases</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

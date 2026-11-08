@@ -37,7 +37,7 @@ The release lifecycle consists of three decoupled GitHub Actions workflows:
 ## 🚀 Workflows Breakdown
 
 ### 1. `release-cycle.yml` (Cadence Scheduler)
-* **File**: [`.github/workflows/release-cycle.yml`](file:///home/cachyos/Work/dhabatui/.github/workflows/release-cycle.yml)
+* **Workflow File**: [`.github/workflows/release-cycle.yml`](https://github.com/itsvrushabh/dhabatui/blob/main/.github/workflows/release-cycle.yml)
 * **Triggers**:
   * Weekly Sunday 00:00 UTC (`cron: '0 0 * * 0'`).
   * Monthly 1st of month 00:00 UTC (`cron: '0 0 1 * *'`).
@@ -52,7 +52,7 @@ The release lifecycle consists of three decoupled GitHub Actions workflows:
   7. Creates and pushes tag `vX.Y.Z` to `origin`.
 
 ### 2. `release.yml` (Binary Assets & GitHub Releases)
-* **File**: [`.github/workflows/release.yml`](file:///home/cachyos/Work/dhabatui/.github/workflows/release.yml)
+* **Workflow File**: [`.github/workflows/release.yml`](https://github.com/itsvrushabh/dhabatui/blob/main/.github/workflows/release.yml)
 * **Triggers**: Push of tag `v*` or manual `workflow_dispatch`.
 * **Targets**:
   * Linux x86_64 (`x86_64-unknown-linux-gnu`) on `ubuntu-latest`.
@@ -65,7 +65,7 @@ The release lifecycle consists of three decoupled GitHub Actions workflows:
   * Attached to the GitHub Release.
 
 ### 3. `cargo-publish.yml` (Crates.io Publication)
-* **File**: [`.github/workflows/cargo-publish.yml`](file:///home/cachyos/Work/dhabatui/.github/workflows/cargo-publish.yml)
+* **Workflow File**: [`.github/workflows/cargo-publish.yml`](https://github.com/itsvrushabh/dhabatui/blob/main/.github/workflows/cargo-publish.yml)
 * **Triggers**: Push of tag `v*` or manual `workflow_dispatch`.
 * **Safety features**:
   * Checks if the package version is already uploaded to crates.io; skips gracefully instead of throwing fatal errors.

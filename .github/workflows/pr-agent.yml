@@ -2,16 +2,29 @@ name: PR Agent
 
 on:
   pull_request:
-    types: [opened, reopened, ready_for_review, synchronize]
+    types: [opened, reopened, ready_for_review]
   issue_comment:
     types: [created]
 
+concurrency:
+  group: pr-agent-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pr_agent_job:
-    if: ${{ github.event.sender.type != 'Bot' }}
+    if: |
+      github.event.sender.type != 'Bot' && (
+        github.event_name == 'pull_request' ||
+        (github.event.comment != null && (
+          contains(github.event.comment.body, '/pr-agent') ||
+          contains(github.event.comment.body, '/review') ||
+          contains(github.event.comment.body, '/describe') ||
+          contains(github.event.comment.body, '/improve')
+        ))
+      )
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
-      contents: write
       issues: write
       pull-requests: write
 
