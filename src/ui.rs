@@ -30,6 +30,7 @@ pub fn render(f: &mut Frame, app: &mut App) {
 
     // Render interactive modal if in input mode
     match app.input_mode {
+        InputMode::SelectingPaymentMethod => render_payment_method_modal(f, app),
         InputMode::EditingPrice => render_edit_price_modal(f, app),
         InputMode::AddingCustomName => render_custom_name_modal(f, app),
         InputMode::AddingCustomPrice => render_custom_price_modal(f, app),
@@ -756,6 +757,102 @@ fn render_custom_price_modal(f: &mut Frame, app: &App) {
             " Set Making Price (Step 2 of 2) ",
             Style::default()
                 .fg(Color::Magenta)
+                .add_modifier(Modifier::BOLD),
+        ));
+
+    let paragraph = Paragraph::new(text)
+        .block(block)
+        .alignment(Alignment::Center);
+    f.render_widget(paragraph, area);
+}
+
+fn render_payment_method_modal(f: &mut Frame, app: &App) {
+    let area = centered_rect(55, 35, f.area());
+    f.render_widget(Clear, area);
+
+    let table = app.active_table();
+    let summary = table.summary();
+
+    let text = vec![
+        Line::from(vec![
+            Span::styled("Settle ", Style::default().fg(Color::DarkGray)),
+            Span::styled(
+                &table.label,
+                Style::default()
+                    .fg(Color::Cyan)
+                    .add_modifier(Modifier::BOLD),
+            ),
+            Span::styled(" — Total Payable: ", Style::default().fg(Color::DarkGray)),
+            Span::styled(
+                format_paise(summary.total_paise),
+                Style::default()
+                    .fg(Color::Green)
+                    .add_modifier(Modifier::BOLD),
+            ),
+        ]),
+        Line::from(""),
+        Line::from(vec![
+            Span::styled(
+                " [1] ",
+                Style::default()
+                    .fg(Color::Black)
+                    .bg(Color::Green)
+                    .add_modifier(Modifier::BOLD),
+            ),
+            Span::styled(
+                " 💵 Cash Payment (Default / Enter) ",
+                Style::default()
+                    .fg(Color::White)
+                    .add_modifier(Modifier::BOLD),
+            ),
+        ]),
+        Line::from(""),
+        Line::from(vec![
+            Span::styled(
+                " [2] ",
+                Style::default()
+                    .fg(Color::Black)
+                    .bg(Color::Cyan)
+                    .add_modifier(Modifier::BOLD),
+            ),
+            Span::styled(
+                " 📱 UPI / Online (GPay, PhonePe, Paytm QR) ",
+                Style::default()
+                    .fg(Color::White)
+                    .add_modifier(Modifier::BOLD),
+            ),
+        ]),
+        Line::from(""),
+        Line::from(vec![
+            Span::styled(
+                " [3] ",
+                Style::default()
+                    .fg(Color::Black)
+                    .bg(Color::Yellow)
+                    .add_modifier(Modifier::BOLD),
+            ),
+            Span::styled(
+                " 📒 Khaata / Credit (Regular Customer) ",
+                Style::default()
+                    .fg(Color::White)
+                    .add_modifier(Modifier::BOLD),
+            ),
+        ]),
+        Line::from(""),
+        Line::from(vec![Span::styled(
+            "Press [1], [2], [3] or Enter for Cash | [Esc] Cancel",
+            Style::default().fg(Color::DarkGray),
+        )]),
+    ];
+
+    let block = Block::default()
+        .borders(Borders::ALL)
+        .border_type(BorderType::Double)
+        .border_style(Style::default().fg(Color::Green))
+        .title(Span::styled(
+            " Select Payment Method ",
+            Style::default()
+                .fg(Color::Green)
                 .add_modifier(Modifier::BOLD),
         ));
 

@@ -70,7 +70,7 @@ Right-click the downloaded file and select **Extract All** (or uncompress).
 | <kbd>+</kbd> / <kbd>-</kbd> | Increase / Decrease item count | When guests order extra rotis |
 | <kbd>m</kbd> | Customer Cooking Fee (*Banwai*) | For customer-brought raw meat preparation |
 | <kbd>e</kbd> | Change Price On-the-Fly | To adjust price or give discount |
-| <kbd>p</kbd> | Settle Bill & Save Receipt | Finalize order and save to `receipt.txt` |
+| <kbd>p</kbd> | Settle Bill & Save Receipt | Choose payment mode (Cash, UPI, Khaata) and save to `receipt.txt` |
 | <kbd>q</kbd> / <kbd>Esc</kbd> | Close Window / Exit | To close any popup safely |
 
 ---

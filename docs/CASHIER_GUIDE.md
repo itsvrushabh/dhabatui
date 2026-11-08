@@ -118,7 +118,12 @@ With the **Current Order** pane focused:
 ### 8. Settle & Save Receipt
 When the customer is ready to pay:
 - Press **`p`** anywhere.
-- The active table's order is atomically committed to `redb` under a sequential invoice number (e.g. `#101`) tagged with the table ID.
+- The **Payment Method Modal** appears with instant single-keypress selection:
+  - **`1`** or **`Enter`**: 💵 **Cash** (Default)
+  - **`2`**: 📱 **UPI / Online** (Google Pay, PhonePe, Paytm QR)
+  - **`3`**: 📒 **Khaata (Credit)** (Trusted regular customer ledger)
+  - **`Esc`**: Cancel and return to order
+- The active table's order is atomically committed to `redb` under a sequential invoice number (e.g. `#101`) tagged with table ID and payment method.
 - The itemized bill is exported to `receipt.txt` (formatted for standard 80mm receipt format) and archived to `receipts/bill_<id>.txt`.
 - The table resets to `Vacant` and a confirmation banner confirms settlement.
 
@@ -146,7 +151,7 @@ When the customer is ready to pay:
 | **`m`** / **`M`** | Global | **Add Custom / Making Charge**: modal for dish description & price |
 | **`d`** / **`D`** | Cart Pane | Delete selected item line from order |
 | **`c`** / **`C`** | Global | Clear active table's order |
-| **`p`** / **`P`** | Global | **Settle & Save**: commit to `redb`, write `receipt.txt`, and clear table |
+| **`p`** / **`P`** | Global | **Settle & Save**: payment method modal (`1:Cash`, `2:UPI`, `3:Khaata`), commit to `redb`, write `receipt.txt`, and clear table |
 | **`q`** / **`Esc`** | Global | Cleanly exit DhabaTUI (or dismiss open popup modal) |
 
 ---

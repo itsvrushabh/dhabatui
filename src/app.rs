@@ -1,6 +1,7 @@
 use crate::db::{Database, DbError};
 use crate::models::{
-    format_paise, parse_rupees_to_paise, BillRecord, CartItem, MenuItem, TableOrder, TableStatus,
+    format_paise, parse_rupees_to_paise, BillRecord, CartItem, MenuItem, PaymentMethod, TableOrder,
+    TableStatus,
 };
 use crate::web::{DashboardData, WebServerHandle};
 use chrono::Local;
@@ -18,6 +19,7 @@ pub enum InputMode {
     Normal,
     QuickCode,
     SearchingMenu,
+    SelectingPaymentMethod,
     EditingPrice,
     AddingCustomName,
     AddingCustomPrice,
@@ -624,7 +626,25 @@ impl App {
 
     // --- Settle & Print Bill ---
 
-    pub fn settle_and_print(&mut self) -> Result<Option<BillRecord>, DbError> {
+    pub fn prompt_settlement(&mut self) {
+        let table = self.active_table();
+        if table.items.is_empty() {
+            self.set_toast(
+                format!(
+                    "{}: Order is empty! Add items before checkout.",
+                    table.label
+                ),
+                ToastType::Error,
+            );
+            return;
+        }
+        self.input_mode = InputMode::SelectingPaymentMethod;
+    }
+
+    pub fn settle_and_print(
+        &mut self,
+        method: PaymentMethod,
+    ) -> Result<Option<BillRecord>, DbError> {
         let table = self.active_table();
         if table.items.is_empty() {
             self.set_toast(
@@ -641,11 +661,12 @@ impl App {
         let table_id = table.id.clone();
         let table_label = table.label.clone();
 
-        match self.db.save_bill(&table_id, &table.items, &summary) {
+        match self.db.save_bill(&table_id, &table.items, &summary, method) {
             Ok(record) => {
                 let msg = format!(
-                    "✓ Bill #{} settled for {} ({})! Saved to receipt.txt",
+                    "✓ Bill #{} settled [{}] for {} ({})! Saved to receipt.txt",
                     record.id,
+                    method.short_code(),
                     table_label,
                     format_paise(record.summary.total_paise)
                 );
@@ -662,6 +683,7 @@ impl App {
 
                 self.cart_state.select(None);
                 self.active_pane = ActivePane::Menu;
+                self.input_mode = InputMode::Normal;
                 self.set_toast(msg, ToastType::Success);
                 self.sync_web_dashboard();
                 Ok(Some(record))
@@ -669,6 +691,7 @@ impl App {
             Err(err) => {
                 tracing::error!(%err, "Error settling bill");
                 self.set_toast(format!("Failed to settle: {err}"), ToastType::Error);
+                self.input_mode = InputMode::Normal;
                 Err(err)
             }
         }
@@ -774,11 +797,30 @@ mod tests {
         assert_eq!(summary.sgst_paise, 1100);
         assert_eq!(summary.total_paise, 46200);
 
-        // Settle & Print
-        let bill = app.settle_and_print().unwrap().unwrap();
+        // Settle & Print with UPI
+        app.prompt_settlement();
+        assert_eq!(app.input_mode, InputMode::SelectingPaymentMethod);
+        let bill = app.settle_and_print(PaymentMethod::Upi).unwrap().unwrap();
         assert_eq!(bill.summary.total_paise, 46200);
+        assert_eq!(bill.payment_method, PaymentMethod::Upi);
         assert!(app.active_table().items.is_empty());
         assert_eq!(app.active_table().status, TableStatus::Vacant);
+        assert_eq!(app.input_mode, InputMode::Normal);
+    }
+
+    #[test]
+    fn test_payment_methods_settlement() {
+        let mut app = setup_test_app();
+        assert!(app.add_item_by_code("101"));
+
+        // Prompt settlement
+        app.prompt_settlement();
+        assert_eq!(app.input_mode, InputMode::SelectingPaymentMethod);
+
+        // Settle with Cash
+        let bill = app.settle_and_print(PaymentMethod::Cash).unwrap().unwrap();
+        assert_eq!(bill.payment_method, PaymentMethod::Cash);
+        assert_eq!(app.recent_bills[0].payment_method, PaymentMethod::Cash);
     }
 
     #[test]

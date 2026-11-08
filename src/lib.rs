@@ -139,7 +139,7 @@ fn run_app<B: ratatui::backend::Backend>(
                             app.start_custom_item();
                         }
                         KeyCode::Char('p') | KeyCode::Char('P') => {
-                            let _ = app.settle_and_print();
+                            app.prompt_settlement();
                         }
                         KeyCode::Char('/') => {
                             app.input_mode = InputMode::SearchingMenu;
@@ -154,6 +154,25 @@ fn run_app<B: ratatui::backend::Backend>(
                             app.input_mode = InputMode::QuickCode;
                             app.quick_code_buffer.clear();
                             app.quick_code_buffer.push(c);
+                        }
+                        _ => {}
+                    },
+
+                    InputMode::SelectingPaymentMethod => match key.code {
+                        KeyCode::Char('1')
+                        | KeyCode::Char('c')
+                        | KeyCode::Char('C')
+                        | KeyCode::Enter => {
+                            let _ = app.settle_and_print(crate::models::PaymentMethod::Cash);
+                        }
+                        KeyCode::Char('2') | KeyCode::Char('u') | KeyCode::Char('U') => {
+                            let _ = app.settle_and_print(crate::models::PaymentMethod::Upi);
+                        }
+                        KeyCode::Char('3') | KeyCode::Char('k') | KeyCode::Char('K') => {
+                            let _ = app.settle_and_print(crate::models::PaymentMethod::Credit);
+                        }
+                        KeyCode::Esc => {
+                            app.input_mode = InputMode::Normal;
                         }
                         _ => {}
                     },
