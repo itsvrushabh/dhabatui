@@ -30,17 +30,23 @@ on:
 
 permissions:
   contents: write
+  actions: write
+
+concurrency:
+  group: release-cycle
+  cancel-in-progress: false
 
 jobs:
   automate-release:
     name: Execute Release Cadence
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -91,6 +97,7 @@ jobs:
         if: github.event.inputs.dry_run != 'true'
         env:
           NEW_TAG: ${{ steps.prepare.outputs.new_tag }}
+          GH_TOKEN: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
         run: |
           # Check if there are changes to commit
           if git diff --quiet Cargo.toml Cargo.lock CHANGELOG.md 2>/dev/null; then
@@ -112,5 +119,14 @@ jobs:
             git tag -a "${NEW_TAG}" -m "DhabaTUI ${NEW_TAG} Release"
             git push origin "${NEW_TAG}"
             echo "Created and pushed tag ${NEW_TAG}."
-            echo "This tag push will trigger both 'Release' and 'Cargo Publish' workflows."
+
+            # GitHub suppresses workflow trigger cascades when pushed by GITHUB_TOKEN.
+            # If no custom RELEASE_PAT is provided, explicitly dispatch downstream workflows.
+            if [ -z "${{ secrets.RELEASE_PAT }}" ]; then
+              echo "Dispatching downstream Release and Cargo Publish workflows via gh CLI..."
+              gh workflow run release.yml -f tag_name="${NEW_TAG}" || echo "::warning ::Could not dispatch release.yml"
+              gh workflow run cargo-publish.yml || echo "::warning ::Could not dispatch cargo-publish.yml"
+            else
+              echo "Tag pushed with RELEASE_PAT. Downstream workflows will trigger automatically."
+            fi
           fi

@@ -123,7 +123,7 @@ When the customer is ready to pay:
 | :--- | :--- | :--- |
 | **`t`** / **`T`** | Global | Cycle active table forward (`T1`..`T8`, `Parcel`) |
 | **`Shift+Tab`** | Global | Cycle active table backward |
-| **`s`** / **`S`** | Global | Cycle table status: `Ordering` ➔ `Served` ➔ `Billed` (resets on settle `p` or clear `c`) |
+| **`s`** / **`S`** | Global | Cycle table status: `Vacant` ➔ `Ordering` ➔ `Served` ➔ `Billed` ➔ `Ordering` (resets on settle `p` or clear `c`) |
 | **`Tab`** | Global | Toggle focus between **Menu Catalog** and **Current Table Order** |
 | **`h`** / **`Left`** | Global | Focus **Menu Catalog** |
 | **`l`** / **`Right`** | Global | Focus **Current Table Order** |

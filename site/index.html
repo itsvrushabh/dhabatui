@@ -183,8 +183,11 @@
         </div>
       </div>
 
-      <div style="text-align: center; margin-top: 2rem;">
-        <p style="color: var(--text-muted); font-size: 0.9rem;">
+      <div style="text-align: center; margin-top: 1.5rem;">
+        <p style="color: var(--text-muted); font-size: 0.85rem; max-width: 650px; margin: 0 auto;">
+          <em>Note for macOS:</em> Because binaries are distributed directly, right-click and choose &ldquo;Open&rdquo; on first launch if prompted by macOS Gatekeeper.
+        </p>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.75rem;">
           Are you a Rust developer? You can also install via Cargo: <code>cargo install dhabatui</code>
         </p>
       </div>
@@ -216,7 +219,7 @@
           <tr>
             <td><kbd>s</kbd></td>
             <td>Change Table Status</td>
-            <td>Toggle Ordering ➔ Served ➔ Billed (resets on settle <kbd>p</kbd> or clear <kbd>c</kbd>)</td>
+            <td>Cycle status: Vacant ➔ Ordering ➔ Served ➔ Billed ➔ Ordering (resets on settle <kbd>p</kbd> or clear <kbd>c</kbd>)</td>
           </tr>
           <tr>
             <td><kbd>Tab</kbd></td>

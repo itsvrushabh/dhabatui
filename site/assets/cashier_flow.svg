@@ -26,9 +26,9 @@
   <text x="42" y="192" class="text-desc">T1..T8 or Parcel Takeaway.</text>
   <rect x="42" y="210" width="180" height="30" fill="#0b0f19" rx="4"/>
   <text x="50" y="230" class="text-hotkey">Press 't' / 'T'</text>
-  <text x="42" y="264" class="text-desc">Cycle active status:</text>
-  <text x="42" y="282" class="text-desc">Ordering ➔ Served ➔</text>
-  <text x="42" y="300" class="text-desc">Billed ('s' cycles)</text>
+  <text x="42" y="264" class="text-desc">Cycle status ('s'):</text>
+  <text x="42" y="282" class="text-desc">Vacant ➔ Ordering ➔</text>
+  <text x="42" y="300" class="text-desc">Served ➔ Billed ➔ Order</text>
 
   <!-- Arrow 1 -> 2 -->
   <path d="M 245 215 L 265 215 M 260 207 L 268 215 L 260 223" class="arrow"/>

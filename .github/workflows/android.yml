@@ -7,14 +7,23 @@ on:
       - 'mobile/android/**'
       - '.github/workflows/android.yml'
   pull_request:
+    branches: [main]
     paths:
       - 'mobile/android/**'
       - '.github/workflows/android.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     name: Build Android App (APK)
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository

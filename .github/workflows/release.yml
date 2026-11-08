@@ -7,17 +7,17 @@ on:
   workflow_dispatch:
     inputs:
       tag_name:
-        description: "Release tag (e.g. v0.1.0)"
+        description: "Release tag (e.g. v0.1.2)"
         required: false
-        default: "v0.1.0"
-
-permissions:
-  contents: write
+        default: ""
 
 jobs:
   build:
     name: Build (${{ matrix.platform.name }})
     runs-on: ${{ matrix.platform.runs-on }}
+    timeout-minutes: 30
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -60,7 +60,12 @@ jobs:
         run: |
           VERSION="${{ github.ref_name }}"
           if [ -z "$VERSION" ] || [ "$VERSION" = "main" ]; then
-            VERSION="${{ github.event.inputs.tag_name || 'v0.1.0' }}"
+            INPUT_TAG="${{ github.event.inputs.tag_name }}"
+            if [ -n "$INPUT_TAG" ]; then
+              VERSION="$INPUT_TAG"
+            else
+              VERSION="v$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')"
+            fi
           fi
 
           TARGET="${{ matrix.platform.target }}"
@@ -99,9 +104,29 @@ jobs:
     name: Publish Release Assets
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: write
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Determine Release Tag
+        id: release_tag
+        shell: bash
+        run: |
+          TAG="${{ github.ref_name }}"
+          if [ -z "$TAG" ] || [ "$TAG" = "main" ]; then
+            INPUT_TAG="${{ github.event.inputs.tag_name }}"
+            if [ -n "$INPUT_TAG" ]; then
+              TAG="$INPUT_TAG"
+            else
+              TAG="v$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')"
+            fi
+          fi
+          echo "tag_name=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "Release tag: ${TAG}"
+
       - name: Download compiled artifacts
         uses: actions/download-artifact@v4
         with:
@@ -120,6 +145,8 @@ jobs:
       - name: Create or Update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.release_tag.outputs.tag_name }}
+          name: DhabaTUI ${{ steps.release_tag.outputs.tag_name }}
           files: |
             dist/dhabatui-*.tar.gz
             dist/dhabatui-*.zip

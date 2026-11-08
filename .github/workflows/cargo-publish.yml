@@ -15,10 +15,15 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   publish:
     name: Publish to Crates.io
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -46,7 +51,8 @@ jobs:
         run: |
           PKG_VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')
           echo "Checking if dhabatui@${PKG_VERSION} is already published to crates.io..."
-          if cargo search "dhabatui" --limit 1 | grep -q "\"${PKG_VERSION}\""; then
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "https://crates.io/api/v1/crates/dhabatui/${PKG_VERSION}" || true)
+          if [ "$HTTP_CODE" = "200" ]; then
             echo "::warning title=Already Published::Crate dhabatui@${PKG_VERSION} already exists on crates.io. Skipping publish."
           else
             cargo publish --locked

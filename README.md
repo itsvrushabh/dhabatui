@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/itsvrushabh/dhabatui/actions/workflows/ci.yml/badge.svg)](https://github.com/itsvrushabh/dhabatui/actions/workflows/ci.yml)
 [![Website](https://img.shields.io/badge/Website-itsvrushabh.github.io%2Fdhabatui-amber?logo=googlechrome)](https://itsvrushabh.github.io/dhabatui/)
-[![Release](https://img.shields.io/badge/Release-v0.1.2-blue)](https://github.com/itsvrushabh/dhabatui/releases)
+[![Release](https://img.shields.io/github/v/release/itsvrushabh/dhabatui?color=blue&label=Release)](https://github.com/itsvrushabh/dhabatui/releases)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 **Fast, 100% offline POS and billing software designed specifically for Indian dhabas, roadside eateries, tea stalls, and casual restaurants.**
@@ -42,8 +42,8 @@ Instead of struggling with a slow mouse or complex cloud software during lunch a
 Download the ready-to-run package from our **[Latest Release](https://github.com/itsvrushabh/dhabatui/releases/latest)**:
 
 * 🪟 **Windows**: [Download `.zip`](https://github.com/itsvrushabh/dhabatui/releases/latest) (Works on Windows 10 & 11)
-* 🍏 **Mac (Apple Silicon M1/M2/M3/M4)**: [Download `.tar.gz`](https://github.com/itsvrushabh/dhabatui/releases/latest)
-* 🍏 **Mac (Intel)**: [Download `.tar.gz`](https://github.com/itsvrushabh/dhabatui/releases/latest)
+* 🍏 **Mac (Apple Silicon M1/M2/M3/M4)**: [Download `.tar.gz`](https://github.com/itsvrushabh/dhabatui/releases/latest) *(Note: On first launch, right-click and choose "Open" if prompted by Gatekeeper)*
+* 🍏 **Mac (Intel)**: [Download `.tar.gz`](https://github.com/itsvrushabh/dhabatui/releases/latest) *(Note: On first launch, right-click and choose "Open" if prompted by Gatekeeper)*
 * 🐧 **Linux**: [Download `.tar.gz`](https://github.com/itsvrushabh/dhabatui/releases/latest)
 
 ### 2. Extract the Folder
@@ -62,7 +62,7 @@ Right-click the downloaded file and select **Extract All** (or uncompress).
 | Key | What It Does | When to Use |
 | :---: | :--- | :--- |
 | <kbd>t</kbd> / <kbd>T</kbd> | Cycle Tables (`T1` to `T8`, Parcel) | When guests sit at a new table |
-| <kbd>s</kbd> | Change Table Status | Toggle `Ordering` ➔ `Served` ➔ `Billed` (resets on settle <kbd>p</kbd> or clear <kbd>c</kbd>) |
+| <kbd>s</kbd> | Change Table Status | Cycle status: `Vacant` ➔ `Ordering` ➔ `Served` ➔ `Billed` ➔ `Ordering` (resets on settle <kbd>p</kbd> or clear <kbd>c</kbd>) |
 | <kbd>Tab</kbd> | Switch Focus (Menu ⟷ Cart) | To browse dishes or adjust order lines |
 | <kbd>0</kbd>–<kbd>9</kbd> + <kbd>Enter</kbd> | Quick Dish Number (e.g. `101`) | To punch items in 1 second |
 | <kbd>+</kbd> / <kbd>-</kbd> | Increase / Decrease item count | When guests order extra rotis |

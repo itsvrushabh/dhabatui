@@ -10,7 +10,7 @@ This operational manual is designed for cashiers, counter staff, and dhaba manag
 | :---: | :--- | :--- |
 | `[t]` / `[T]` | Cycle Dining Tables (`T1`–`T8`, Parcel) | Table bar at top |
 | `[Shift+Tab]` | Cycle Dining Tables Backward | Table bar at top |
-| `[s]` | Cycle Table Status: `Ordering` ➔ `Served` ➔ `Billed` (resets on settle `[p]` or clear `[c]`) | Table bar at top |
+| `[s]` | Cycle Table Status: `Vacant` ➔ `Ordering` ➔ `Served` ➔ `Billed` ➔ `Ordering` (resets on settle `[p]` or clear `[c]`) | Table bar at top |
 | `[Tab]` | Switch Focus (Menu Catalog ⟷ Order Cart) | Main panes |
 | `[Enter]` | Add highlighted item to order / Confirm modal | Menu Catalog |
 | `[0]`–`[9]` + `[Enter]` | Rapid 3-digit dish code entry (e.g. `101`) | Fast counter ordering |

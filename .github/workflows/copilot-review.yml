@@ -6,6 +6,10 @@ on:
   issue_comment:
     types: [created]
 
+concurrency:
+  group: copilot-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   request-copilot-review:
     name: Request Copilot Review
@@ -13,13 +17,11 @@ jobs:
       (github.event_name == 'pull_request' && !github.event.pull_request.draft) ||
       (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/copilot'))
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       pull-requests: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       - name: Determine PR Number
         id: pr_info
         run: |
