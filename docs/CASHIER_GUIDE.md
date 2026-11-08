@@ -129,6 +129,19 @@ When the customer is ready to pay:
 
 ---
 
+### 9. Day-End Sales Summary & Cash Reconciliation (Z-Report)
+At the end of a shift or closing time:
+- Press **`r`** (or **`z`**) from anywhere in the counter.
+- A comprehensive **Z-Report** modal opens, displaying:
+  - Total invoices settled and total dish items prepared.
+  - Dine-in vs. Parcel takeaway sales breakdown.
+  - Subtotal, collected CGST/SGST, and grand total daily revenue.
+  - Top-selling dishes by order volume.
+- Automatically exports an 80mm receipt-format closure slip to `daily_report.txt` and archives it in `receipts/daily_report_<date>.txt`.
+- Press **`Esc`** or **`r`** to close the report modal.
+
+---
+
 ## ⌨️ Complete Keyboard Shortcuts Reference
 
 | Shortcut | Context | Action |
@@ -152,6 +165,7 @@ When the customer is ready to pay:
 | **`d`** / **`D`** | Cart Pane | Delete selected item line from order |
 | **`c`** / **`C`** | Global | Clear active table's order |
 | **`p`** / **`P`** | Global | **Settle & Save**: payment method modal (`1:Cash`, `2:UPI`, `3:Khaata`), commit to `redb`, write `receipt.txt`, and clear table |
+| **`r`** / **`z`** | Global | **Day-End Summary (Z-Report)**: view closure totals, export `daily_report.txt` |
 | **`q`** / **`Esc`** | Global | Cleanly exit DhabaTUI (or dismiss open popup modal) |
 
 ---

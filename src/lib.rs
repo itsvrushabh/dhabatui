@@ -150,6 +150,12 @@ fn run_app<B: ratatui::backend::Backend>(
                         KeyCode::Char('f') | KeyCode::Char('F') => {
                             app.cycle_category();
                         }
+                        KeyCode::Char('r')
+                        | KeyCode::Char('R')
+                        | KeyCode::Char('z')
+                        | KeyCode::Char('Z') => {
+                            app.show_daily_report();
+                        }
                         KeyCode::Char(c) if c.is_ascii_digit() => {
                             app.input_mode = InputMode::QuickCode;
                             app.quick_code_buffer.clear();
@@ -173,6 +179,20 @@ fn run_app<B: ratatui::backend::Backend>(
                         }
                         KeyCode::Esc => {
                             app.input_mode = InputMode::Normal;
+                        }
+                        _ => {}
+                    },
+
+                    InputMode::ViewingDailyReport => match key.code {
+                        KeyCode::Esc
+                        | KeyCode::Enter
+                        | KeyCode::Char('q')
+                        | KeyCode::Char('Q')
+                        | KeyCode::Char('r')
+                        | KeyCode::Char('R')
+                        | KeyCode::Char('z')
+                        | KeyCode::Char('Z') => {
+                            app.close_daily_report();
                         }
                         _ => {}
                     },

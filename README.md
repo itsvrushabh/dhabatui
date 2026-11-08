@@ -71,6 +71,7 @@ Right-click the downloaded file and select **Extract All** (or uncompress).
 | <kbd>m</kbd> | Customer Cooking Fee (*Banwai*) | For customer-brought raw meat preparation |
 | <kbd>e</kbd> | Change Price On-the-Fly | To adjust price or give discount |
 | <kbd>p</kbd> | Settle Bill & Save Receipt | Choose payment mode (Cash, UPI, Khaata) and save to `receipt.txt` |
+| <kbd>r</kbd> / <kbd>z</kbd> | Day-End Closure (Z-Report) | View daily sales summary & export `daily_report.txt` |
 | <kbd>q</kbd> / <kbd>Esc</kbd> | Close Window / Exit | To close any popup safely |
 
 ---

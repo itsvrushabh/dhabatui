@@ -1,7 +1,7 @@
 use crate::db::{Database, DbError};
 use crate::models::{
-    format_paise, parse_rupees_to_paise, BillRecord, CartItem, MenuItem, PaymentMethod, TableOrder,
-    TableStatus,
+    format_paise, parse_rupees_to_paise, BillRecord, CartItem, DailyReport, MenuItem,
+    PaymentMethod, TableOrder, TableStatus,
 };
 use crate::web::{DashboardData, WebServerHandle};
 use chrono::Local;
@@ -20,6 +20,7 @@ pub enum InputMode {
     QuickCode,
     SearchingMenu,
     SelectingPaymentMethod,
+    ViewingDailyReport,
     EditingPrice,
     AddingCustomName,
     AddingCustomPrice,
@@ -50,6 +51,7 @@ pub struct App {
     pub should_quit: bool,
     pub web_handle: Option<WebServerHandle>,
     pub recent_bills: Vec<BillRecord>,
+    pub daily_report: Option<DailyReport>,
 }
 
 impl App {
@@ -99,6 +101,7 @@ impl App {
             should_quit: false,
             web_handle: None,
             recent_bills,
+            daily_report: None,
         };
 
         // Start LAN web server
@@ -696,6 +699,30 @@ impl App {
             }
         }
     }
+
+    // --- Daily Sales Closure Report (Z-Report) ---
+
+    pub fn show_daily_report(&mut self) {
+        let today = Local::now().format("%Y-%m-%d").to_string();
+        match self.db.get_daily_report(&today) {
+            Ok(report) => {
+                let _ = self.db.export_daily_report(&report);
+                self.daily_report = Some(report);
+                self.input_mode = InputMode::ViewingDailyReport;
+            }
+            Err(err) => {
+                tracing::error!(%err, "Failed to compute daily report");
+                self.set_toast(
+                    format!("Failed to generate report: {err}"),
+                    ToastType::Error,
+                );
+            }
+        }
+    }
+
+    pub fn close_daily_report(&mut self) {
+        self.input_mode = InputMode::Normal;
+    }
 }
 
 #[cfg(test)]
@@ -850,5 +877,21 @@ mod tests {
         let orig_cat = app.selected_category.clone();
         app.cycle_category();
         assert_ne!(app.selected_category, orig_cat);
+    }
+
+    #[test]
+    fn test_daily_report_workflow() {
+        let mut app = setup_test_app();
+        assert!(app.add_item_by_code("101"));
+        let _ = app.settle_and_print(PaymentMethod::Cash);
+
+        app.show_daily_report();
+        assert_eq!(app.input_mode, InputMode::ViewingDailyReport);
+        let report = app.daily_report.as_ref().unwrap();
+        assert_eq!(report.total_bills, 1);
+        assert_eq!(report.total_items_sold, 1);
+
+        app.close_daily_report();
+        assert_eq!(app.input_mode, InputMode::Normal);
     }
 }

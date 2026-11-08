@@ -222,8 +222,32 @@ pub struct BillRecord {
     pub payment_method: PaymentMethod,
 }
 
+/// Aggregated day-end / shift closure sales summary (Z-Report).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct DailyReport {
+    pub date: String,
+    pub total_bills: u32,
+    pub total_items_sold: u32,
+    pub subtotal_paise: u64,
+    pub cgst_paise: u64,
+    pub sgst_paise: u64,
+    pub grand_total_paise: u64,
+    pub dine_in_bills: u32,
+    pub dine_in_total_paise: u64,
+    pub parcel_bills: u32,
+    pub parcel_total_paise: u64,
+    pub top_items: Vec<(String, u32, u64)>,
+}
+
 /// Formats integer paise into a standard Rupee string (`₹XX.YY`).
 pub fn format_paise(paise: u32) -> String {
+    let rupees = paise / 100;
+    let fraction = paise % 100;
+    format!("₹{}.{:02}", rupees, fraction)
+}
+
+/// Formats integer paise stored as u64 into a standard Rupee string (`₹XX.YY`).
+pub fn format_paise_u64(paise: u64) -> String {
     let rupees = paise / 100;
     let fraction = paise % 100;
     format!("₹{}.{:02}", rupees, fraction)
