@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-11-08 - Weekly Patch Release
+
+### 🐛 Bug Fixes
+- eccbdef fix(financials): eliminate f64 float division in price editing per OpenCode review
+
+### ⚙️ CI / Automation
+- 520bdba ci(opencode): enable use_github_token for direct token usage
+- a68ecde ci(opencode): specify default model for OpenCode GitHub action
+- 14afe8f ci(opencode): add OpenCode automated PR review workflow with OIDC authentication (closes #34)
+- f6ef4fb ci(release): implement release cycle (Yearly LTS, Monthly Minor, Weekly Patch), automation workflow, project wiki, and docs
+
+### 📝 Documentation
+- 8699812 docs(release): polish release script, sync-wiki, and changelog per review feedback
+
+
+
 ---
 
 ## [0.1.2] - 2026-11-02
