@@ -142,6 +142,16 @@ At the end of a shift or closing time:
 
 ---
 
+### 10. Bill History Viewer & Duplicate Receipt Reprinting
+If a customer asks for a duplicate receipt or to verify past bills:
+- Press **`b`** anywhere in the counter.
+- Browse past invoices chronologically with **`j`** / **`k`** (Down/Up).
+- The right panel shows the full itemized preview (items, quantities, subtotal, GST, grand total).
+- Press **`Enter`** to reprint the selected bill marked with `*** DUPLICATE RECEIPT ***` to `receipt.txt`.
+- Press **`Esc`** or **`b`** to close the viewer.
+
+---
+
 ## ⌨️ Complete Keyboard Shortcuts Reference
 
 | Shortcut | Context | Action |
@@ -166,6 +176,7 @@ At the end of a shift or closing time:
 | **`c`** / **`C`** | Global | Clear active table's order |
 | **`p`** / **`P`** | Global | **Settle & Save**: payment method modal (`1:Cash`, `2:UPI`, `3:Khaata`), commit to `redb`, write `receipt.txt`, and clear table |
 | **`r`** / **`z`** | Global | **Day-End Summary (Z-Report)**: view closure totals, export `daily_report.txt` |
+| **`b`** / **`B`** | Global | **Bill History**: view past settled invoices & reprint duplicate slip |
 | **`q`** / **`Esc`** | Global | Cleanly exit DhabaTUI (or dismiss open popup modal) |
 
 ---

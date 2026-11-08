@@ -21,6 +21,7 @@ pub enum InputMode {
     SearchingMenu,
     SelectingPaymentMethod,
     ViewingDailyReport,
+    ViewingHistory,
     EditingPrice,
     AddingCustomName,
     AddingCustomPrice,
@@ -52,6 +53,8 @@ pub struct App {
     pub web_handle: Option<WebServerHandle>,
     pub recent_bills: Vec<BillRecord>,
     pub daily_report: Option<DailyReport>,
+    pub history_bills: Vec<BillRecord>,
+    pub history_selected_idx: usize,
 }
 
 impl App {
@@ -102,6 +105,8 @@ impl App {
             web_handle: None,
             recent_bills,
             daily_report: None,
+            history_bills: Vec::new(),
+            history_selected_idx: 0,
         };
 
         // Start LAN web server
@@ -723,6 +728,64 @@ impl App {
     pub fn close_daily_report(&mut self) {
         self.input_mode = InputMode::Normal;
     }
+
+    // --- Bill History & Duplicate Receipt Viewer ---
+
+    pub fn open_history(&mut self) {
+        match self.db.get_recent_bills(50) {
+            Ok(bills) => {
+                self.history_bills = bills;
+                self.history_selected_idx = 0;
+                self.input_mode = InputMode::ViewingHistory;
+            }
+            Err(err) => {
+                tracing::error!(%err, "Failed to load bill history");
+                self.set_toast(
+                    format!("Failed to load bill history: {err}"),
+                    ToastType::Error,
+                );
+            }
+        }
+    }
+
+    pub fn history_next(&mut self) {
+        if !self.history_bills.is_empty()
+            && self.history_selected_idx + 1 < self.history_bills.len()
+        {
+            self.history_selected_idx += 1;
+        }
+    }
+
+    pub fn history_previous(&mut self) {
+        if self.history_selected_idx > 0 {
+            self.history_selected_idx -= 1;
+        }
+    }
+
+    pub fn reprint_selected_bill(&mut self) {
+        if let Some(bill) = self.history_bills.get(self.history_selected_idx) {
+            match self.db.export_duplicate_receipt(bill) {
+                Ok(_) => {
+                    self.set_toast(
+                        format!(
+                            "✓ Reprinted duplicate receipt for Bill #{}! Saved to receipt.txt",
+                            bill.id
+                        ),
+                        ToastType::Success,
+                    );
+                    self.input_mode = InputMode::Normal;
+                }
+                Err(err) => {
+                    tracing::error!(%err, "Failed to reprint duplicate receipt");
+                    self.set_toast(format!("Failed to reprint: {err}"), ToastType::Error);
+                }
+            }
+        }
+    }
+
+    pub fn close_history(&mut self) {
+        self.input_mode = InputMode::Normal;
+    }
 }
 
 #[cfg(test)]
@@ -731,8 +794,8 @@ mod tests {
     use tempfile::tempdir;
 
     fn setup_test_app() -> App {
-        let dir = tempdir().unwrap();
-        let db_path = dir.path().join("app_test.redb");
+        let dir = tempdir().unwrap().keep();
+        let db_path = dir.join("app_test.redb");
         let db = Database::open(&db_path).unwrap();
         App::new(db).unwrap()
     }
@@ -893,5 +956,23 @@ mod tests {
 
         app.close_daily_report();
         assert_eq!(app.input_mode, InputMode::Normal);
+    }
+
+    #[test]
+    fn test_history_and_duplicate_reprint() {
+        let mut app = setup_test_app();
+        assert!(app.add_item_by_code("101"));
+        let settled_bill = app.settle_and_print(PaymentMethod::Cash).unwrap().unwrap();
+
+        // Open history
+        app.open_history();
+        assert_eq!(app.input_mode, InputMode::ViewingHistory);
+        assert_eq!(app.history_bills.len(), 1);
+        assert_eq!(app.history_bills[0].id, settled_bill.id);
+
+        // Reprint
+        app.reprint_selected_bill();
+        assert_eq!(app.input_mode, InputMode::Normal);
+        assert!(app.toast.as_ref().unwrap().0.contains("Reprinted"));
     }
 }

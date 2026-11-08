@@ -32,6 +32,7 @@ pub fn render(f: &mut Frame, app: &mut App) {
     match app.input_mode {
         InputMode::SelectingPaymentMethod => render_payment_method_modal(f, app),
         InputMode::ViewingDailyReport => render_daily_report_modal(f, app),
+        InputMode::ViewingHistory => render_history_modal(f, app),
         InputMode::EditingPrice => render_edit_price_modal(f, app),
         InputMode::AddingCustomName => render_custom_name_modal(f, app),
         InputMode::AddingCustomPrice => render_custom_price_modal(f, app),
@@ -552,6 +553,13 @@ fn render_footer(f: &mut Frame, _app: &App, area: Rect) {
         ),
         Span::raw(":Report | "),
         Span::styled(
+            "b",
+            Style::default()
+                .fg(Color::Cyan)
+                .add_modifier(Modifier::BOLD),
+        ),
+        Span::raw(":History | "),
+        Span::styled(
             "q",
             Style::default()
                 .fg(Color::White)
@@ -1021,4 +1029,216 @@ fn render_daily_report_modal(f: &mut Frame, app: &App) {
         .block(block)
         .alignment(Alignment::Left);
     f.render_widget(paragraph, area);
+}
+
+fn render_history_modal(f: &mut Frame, app: &App) {
+    let area = centered_rect(80, 80, f.area());
+    f.render_widget(Clear, area);
+
+    let main_block = Block::default()
+        .borders(Borders::ALL)
+        .border_type(BorderType::Double)
+        .border_style(Style::default().fg(Color::Cyan))
+        .title(Span::styled(
+            " 🧾 Past Bills History & Duplicate Receipt Reprint ",
+            Style::default()
+                .fg(Color::Cyan)
+                .add_modifier(Modifier::BOLD),
+        ));
+
+    let inner = main_block.inner(area);
+    f.render_widget(main_block, area);
+
+    if app.history_bills.is_empty() {
+        let msg = Paragraph::new("No settled bills recorded in database yet.")
+            .alignment(Alignment::Center);
+        f.render_widget(msg, inner);
+        return;
+    }
+
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([Constraint::Min(5), Constraint::Length(2)])
+        .split(inner);
+
+    let split = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([Constraint::Percentage(45), Constraint::Percentage(55)])
+        .split(chunks[0]);
+
+    // Left pane: Bills list
+    let items: Vec<ListItem> = app
+        .history_bills
+        .iter()
+        .enumerate()
+        .map(|(i, b)| {
+            let is_selected = i == app.history_selected_idx;
+            let style = if is_selected {
+                Style::default()
+                    .fg(Color::Black)
+                    .bg(Color::Cyan)
+                    .add_modifier(Modifier::BOLD)
+            } else {
+                Style::default().fg(Color::White)
+            };
+
+            let line = format!(
+                "#{:<5} Table {:<4} {:>10}  {}",
+                b.id,
+                b.table_id,
+                format_paise(b.summary.total_paise),
+                if b.timestamp.len() >= 16 {
+                    &b.timestamp[11..16]
+                } else {
+                    &b.timestamp
+                }
+            );
+            ListItem::new(line).style(style)
+        })
+        .collect();
+
+    let list = List::new(items)
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(Color::DarkGray))
+                .title(" Invoices (j/k: Select) "),
+        )
+        .highlight_spacing(HighlightSpacing::Never);
+    f.render_widget(list, split[0]);
+
+    // Right pane: Selected Bill Details
+    if let Some(bill) = app.history_bills.get(app.history_selected_idx) {
+        let mut detail_lines = vec![
+            Line::from(vec![
+                Span::styled("Invoice No: ", Style::default().fg(Color::DarkGray)),
+                Span::styled(
+                    format!("#{}", bill.id),
+                    Style::default()
+                        .fg(Color::Yellow)
+                        .add_modifier(Modifier::BOLD),
+                ),
+                Span::raw("    "),
+                Span::styled("Table: ", Style::default().fg(Color::DarkGray)),
+                Span::styled(
+                    &bill.table_id,
+                    Style::default()
+                        .fg(Color::Cyan)
+                        .add_modifier(Modifier::BOLD),
+                ),
+            ]),
+            Line::from(vec![
+                Span::styled("Timestamp:  ", Style::default().fg(Color::DarkGray)),
+                Span::styled(&bill.timestamp, Style::default().fg(Color::White)),
+            ]),
+            Line::from("─".repeat(40)),
+            Line::from(vec![Span::styled(
+                format!("{:<22} {:>3} {:>12}", "Item", "Qty", "Total"),
+                Style::default().fg(Color::Yellow),
+            )]),
+            Line::from("─".repeat(40)),
+        ];
+
+        for item in &bill.items {
+            let name_short = if item.name.len() > 22 {
+                &item.name[..22]
+            } else {
+                &item.name
+            };
+            detail_lines.push(Line::from(vec![
+                Span::styled(
+                    format!("{:<22} ", name_short),
+                    Style::default().fg(Color::White),
+                ),
+                Span::styled(
+                    format!("{:>3} ", item.quantity),
+                    Style::default().fg(Color::Yellow),
+                ),
+                Span::styled(
+                    format!("{:>12}", format_paise(item.line_total_paise())),
+                    Style::default().fg(Color::Green),
+                ),
+            ]));
+        }
+
+        detail_lines.push(Line::from("─".repeat(40)));
+        detail_lines.push(Line::from(vec![
+            Span::styled(
+                "Subtotal:               ",
+                Style::default().fg(Color::DarkGray),
+            ),
+            Span::styled(
+                format!("{:>14}", format_paise(bill.summary.subtotal_paise)),
+                Style::default().fg(Color::White),
+            ),
+        ]));
+        detail_lines.push(Line::from(vec![
+            Span::styled(
+                "CGST (2.5%):            ",
+                Style::default().fg(Color::DarkGray),
+            ),
+            Span::styled(
+                format!("{:>14}", format_paise(bill.summary.cgst_paise)),
+                Style::default().fg(Color::DarkGray),
+            ),
+        ]));
+        detail_lines.push(Line::from(vec![
+            Span::styled(
+                "SGST (2.5%):            ",
+                Style::default().fg(Color::DarkGray),
+            ),
+            Span::styled(
+                format!("{:>14}", format_paise(bill.summary.sgst_paise)),
+                Style::default().fg(Color::DarkGray),
+            ),
+        ]));
+        detail_lines.push(Line::from("═".repeat(40)));
+        detail_lines.push(Line::from(vec![
+            Span::styled(
+                "GRAND TOTAL:            ",
+                Style::default()
+                    .fg(Color::Green)
+                    .add_modifier(Modifier::BOLD),
+            ),
+            Span::styled(
+                format!("{:>14}", format_paise(bill.summary.total_paise)),
+                Style::default()
+                    .fg(Color::Green)
+                    .add_modifier(Modifier::BOLD),
+            ),
+        ]));
+
+        let details = Paragraph::new(detail_lines).block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(Color::DarkGray))
+                .title(format!(" Bill #{} Preview ", bill.id)),
+        );
+        f.render_widget(details, split[1]);
+    }
+
+    // Bottom guide
+    let guide = Line::from(vec![
+        Span::styled(
+            "[Enter]",
+            Style::default()
+                .fg(Color::Green)
+                .add_modifier(Modifier::BOLD),
+        ),
+        Span::raw(" Reprint Duplicate Slip to receipt.txt   "),
+        Span::styled(
+            "[j/k]",
+            Style::default()
+                .fg(Color::Cyan)
+                .add_modifier(Modifier::BOLD),
+        ),
+        Span::raw(" Navigate Bills   "),
+        Span::styled(
+            "[Esc]",
+            Style::default().fg(Color::Red).add_modifier(Modifier::BOLD),
+        ),
+        Span::raw(" Close"),
+    ]);
+    let guide_p = Paragraph::new(guide).alignment(Alignment::Center);
+    f.render_widget(guide_p, chunks[1]);
 }
