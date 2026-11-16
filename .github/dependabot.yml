@@ -6,11 +6,16 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+      time: "04:00"
+      timezone: "Asia/Kolkata"
     open-pull-requests-limit: 10
     groups:
-      dependencies:
+      cargo-dependencies:
         patterns:
           - "*"
+        update-types:
+          - "minor"
+          - "patch"
     commit-message:
       prefix: "chore(deps)"
 
@@ -20,11 +25,16 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+      time: "04:00"
+      timezone: "Asia/Kolkata"
     open-pull-requests-limit: 5
     groups:
       actions:
         patterns:
           - "*"
+        update-types:
+          - "minor"
+          - "patch"
     commit-message:
       prefix: "ci(actions)"
 
@@ -34,7 +44,16 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+      time: "04:00"
+      timezone: "Asia/Kolkata"
     open-pull-requests-limit: 5
+    groups:
+      android-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
     commit-message:
       prefix: "chore(android-deps)"
 
@@ -44,6 +63,15 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+      time: "04:00"
+      timezone: "Asia/Kolkata"
     open-pull-requests-limit: 5
+    groups:
+      ios-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
     commit-message:
       prefix: "chore(ios-deps)"
