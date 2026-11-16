@@ -78,7 +78,9 @@ fn run_app<B: ratatui::backend::Backend>(
     app: &mut App,
 ) -> io::Result<()> {
     while !app.should_quit {
-        terminal.draw(|f| ui::render(f, app))?;
+        terminal
+            .draw(|f| ui::render(f, app))
+            .map_err(|e| io::Error::other(e.to_string()))?;
 
         if event::poll(Duration::from_millis(250))? {
             if let Event::Key(key) = event::read()? {
