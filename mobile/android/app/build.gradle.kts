@@ -61,7 +61,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
 
     // Coroutines & OkHttp for reliable LAN polling
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.google.code.gson:gson:2.10.1")
 }
