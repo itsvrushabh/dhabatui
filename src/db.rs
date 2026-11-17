@@ -3,7 +3,10 @@ use crate::models::{
     PaymentMethod,
 };
 use chrono::Local;
-use redb::{Database as RedbDatabase, ReadableTable, ReadableTableMetadata, TableDefinition};
+use redb::{
+    Database as RedbDatabase, ReadableDatabase, ReadableTable, ReadableTableMetadata,
+    TableDefinition,
+};
 use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::Write;
@@ -33,6 +36,8 @@ pub enum DbError {
     Storage(#[from] Box<redb::StorageError>),
     #[error("Commit error: {0}")]
     Commit(#[from] Box<redb::CommitError>),
+    #[error("Database migration error: {0}")]
+    Migration(String),
 }
 
 impl From<redb::Error> for DbError {
@@ -92,7 +97,18 @@ impl Database {
 
         let db = if path_ref.exists() {
             tracing::info!(path = %path_ref.display(), "Opening existing redb database");
-            RedbDatabase::open(path_ref)?
+            match RedbDatabase::open(path_ref) {
+                Ok(db) => db,
+                Err(redb::DatabaseError::UpgradeRequired(2)) => {
+                    tracing::info!(
+                        path = %path_ref.display(),
+                        "Detected legacy redb v2 database format; performing automatic migration to v4"
+                    );
+                    Self::migrate_v2_to_v4(path_ref)?;
+                    RedbDatabase::open(path_ref)?
+                }
+                Err(err) => return Err(DbError::DatabaseError(Box::new(err))),
+            }
         } else {
             tracing::info!(path = %path_ref.display(), "Creating new redb database");
             RedbDatabase::create(path_ref)?
@@ -107,6 +123,138 @@ impl Database {
         db_instance.init_tables_and_seeds()?;
 
         Ok(db_instance)
+    }
+
+    /// Automatically migrates a legacy redb v2 database file to redb v4.
+    ///
+    /// The migration preserves:
+    /// - `menu_items`: catalog dishes and custom charges
+    /// - `bills`: all historical settled invoices
+    /// - `metadata`: the sequential bill numbering counter (`next_bill_id`)
+    ///
+    /// The original v2 file is safely archived as `<path>.v2.bak` before replacement.
+    pub fn migrate_v2_to_v4<P: AsRef<Path>>(path: P) -> Result<(), DbError> {
+        let path_ref = path.as_ref();
+
+        let backup_path = {
+            let mut p = path_ref.as_os_str().to_os_string();
+            p.push(".v2.bak");
+            PathBuf::from(p)
+        };
+        let staging_path = {
+            let mut p = path_ref.as_os_str().to_os_string();
+            p.push(".migrating");
+            PathBuf::from(p)
+        };
+
+        // Step 1: Open the legacy v2 database in read-only mode and extract all data
+        const LEGACY_MENU_TABLE: redb_legacy::TableDefinition<&str, &[u8]> =
+            redb_legacy::TableDefinition::new("menu_items");
+        const LEGACY_BILLS_TABLE: redb_legacy::TableDefinition<u64, &[u8]> =
+            redb_legacy::TableDefinition::new("bills");
+        const LEGACY_META_TABLE: redb_legacy::TableDefinition<&str, u64> =
+            redb_legacy::TableDefinition::new("metadata");
+
+        let legacy_db = redb_legacy::Database::open(path_ref)
+            .map_err(|e| DbError::Migration(format!("Failed to open legacy v2 database: {e}")))?;
+
+        let legacy_read_txn = legacy_db
+            .begin_read()
+            .map_err(|e| DbError::Migration(format!("Failed to begin legacy read txn: {e}")))?;
+
+        let mut menu_items: Vec<(String, Vec<u8>)> = Vec::new();
+        if let Ok(table) = legacy_read_txn.open_table(LEGACY_MENU_TABLE) {
+            use redb_legacy::ReadableTable;
+            let rows = table.iter().map_err(|e| {
+                DbError::Migration(format!("Failed to iter legacy menu table: {e}"))
+            })?;
+            for row in rows {
+                let (k, v) = row.map_err(|e| {
+                    DbError::Migration(format!("Error reading legacy menu row: {e}"))
+                })?;
+                menu_items.push((k.value().to_string(), v.value().to_vec()));
+            }
+        }
+
+        let mut bills: Vec<(u64, Vec<u8>)> = Vec::new();
+        if let Ok(table) = legacy_read_txn.open_table(LEGACY_BILLS_TABLE) {
+            use redb_legacy::ReadableTable;
+            let rows = table.iter().map_err(|e| {
+                DbError::Migration(format!("Failed to iter legacy bills table: {e}"))
+            })?;
+            for row in rows {
+                let (k, v) = row.map_err(|e| {
+                    DbError::Migration(format!("Error reading legacy bill row: {e}"))
+                })?;
+                bills.push((k.value(), v.value().to_vec()));
+            }
+        }
+
+        let mut metadata: Vec<(String, u64)> = Vec::new();
+        if let Ok(table) = legacy_read_txn.open_table(LEGACY_META_TABLE) {
+            use redb_legacy::ReadableTable;
+            let rows = table.iter().map_err(|e| {
+                DbError::Migration(format!("Failed to iter legacy meta table: {e}"))
+            })?;
+            for row in rows {
+                let (k, v) = row.map_err(|e| {
+                    DbError::Migration(format!("Error reading legacy meta row: {e}"))
+                })?;
+                metadata.push((k.value().to_string(), v.value()));
+            }
+        }
+
+        // Release file handles by dropping transactions and database instance
+        drop(legacy_read_txn);
+        drop(legacy_db);
+
+        // Step 2: Remove any stale staging file from previous attempts
+        if staging_path.exists() {
+            let _ = fs::remove_file(&staging_path);
+        }
+
+        // Step 3: Populate the new redb v4 staging file atomically
+        {
+            let v4_db = RedbDatabase::create(&staging_path)?;
+            let write_txn = v4_db.begin_write()?;
+            {
+                let mut menu_table = write_txn.open_table(MENU_TABLE)?;
+                for (k, v) in &menu_items {
+                    menu_table.insert(k.as_str(), v.as_slice())?;
+                }
+
+                let mut bills_table = write_txn.open_table(BILLS_TABLE)?;
+                for (k, v) in &bills {
+                    bills_table.insert(*k, v.as_slice())?;
+                }
+
+                let mut meta_table = write_txn.open_table(META_TABLE)?;
+                for (k, v) in &metadata {
+                    meta_table.insert(k.as_str(), *v)?;
+                }
+            }
+            write_txn.commit()?;
+        }
+
+        // Step 4: Archive legacy database file to .v2.bak
+        if backup_path.exists() {
+            let _ = fs::remove_file(&backup_path);
+        }
+        fs::rename(path_ref, &backup_path)?;
+
+        // Step 5: Atomically swap staging database into active position
+        fs::rename(&staging_path, path_ref)?;
+
+        tracing::info!(
+            path = %path_ref.display(),
+            backup = %backup_path.display(),
+            menu_count = menu_items.len(),
+            bills_count = bills.len(),
+            meta_count = metadata.len(),
+            "Successfully completed redb v2 to v4 migration"
+        );
+
+        Ok(())
     }
 
     /// Initializes tables and seeds default items if menu is empty.
@@ -712,5 +860,34 @@ mod tests {
         let exported = db.export_daily_report(&report).unwrap();
         assert!(exported.contains("DAILY CLOSURE / Z-REPORT"));
         assert!(dir.path().join("daily_report.txt").exists());
+    }
+
+    #[test]
+    fn test_v2_to_v4_migration_routine() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("v2_db.redb");
+
+        // Seed v2 database
+        {
+            let legacy_db = redb_legacy::Database::create(&db_path).unwrap();
+            let write_txn = legacy_db.begin_write().unwrap();
+            {
+                const LEGACY_MENU: redb_legacy::TableDefinition<&str, &[u8]> =
+                    redb_legacy::TableDefinition::new("menu_items");
+                let mut table = write_txn.open_table(LEGACY_MENU).unwrap();
+                let item = MenuItem::new("888", "Special Lassi", "Beverages", 5000);
+                let serialized = serde_json::to_vec(&item).unwrap();
+                table.insert("888", serialized.as_slice()).unwrap();
+            }
+            write_txn.commit().unwrap();
+        }
+
+        // Open with v4 Database
+        let db = Database::open(&db_path).unwrap();
+        let menu = db.get_menu().unwrap();
+        assert!(menu
+            .iter()
+            .any(|m| m.code == "888" && m.name == "Special Lassi"));
+        assert!(dir.path().join("v2_db.redb.v2.bak").exists());
     }
 }

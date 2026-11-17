@@ -21,7 +21,7 @@ When generating code, analyzing pull requests, or providing review comments for 
 | :--- | :--- | :--- |
 | **Language** | Rust (2021 Edition) | Adhere to standard Rust idioms and zero-cost abstractions. |
 | **Terminal UI** | `ratatui` (v0.29+) + `crossterm` (v0.28+) | Always use alternate screen buffers and manage raw terminal mode safely. |
-| **ACID Database** | `redb` (v2.x) | Single-file embedded storage (`dhabatui.redb`). No external DB engines. |
+| **ACID Database** | `redb` (v4.x) | Single-file embedded storage (`dhabatui.redb`). No external DB engines. |
 | **Web Server** | `tiny_http` (v0.12+) | Synchronous background thread. Zero async runtime overhead. |
 | **Serialization** | `serde` + `serde_json` | Clean JSON models for state synchronization. |
 | **Logging** | `tracing` + `tracing-appender` | Non-blocking file logging to `dhabatui.log`. Never print logs directly to stdout/stderr. |
