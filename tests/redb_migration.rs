@@ -39,7 +39,7 @@ fn test_automated_v2_to_v4_migration_end_to_end() {
                 quantity: 2,
                 is_custom: false,
             };
-            let sample_summary = BillSummary::calculate(&[sample_item.clone()]);
+            let sample_summary = BillSummary::calculate(std::slice::from_ref(&sample_item));
             let sample_bill = BillRecord {
                 id: 144,
                 table_id: "T3".to_string(),
@@ -106,9 +106,14 @@ fn test_automated_v2_to_v4_migration_end_to_end() {
         quantity: 1,
         is_custom: false,
     };
-    let new_summary = BillSummary::calculate(&[new_item.clone()]);
+    let new_summary = BillSummary::calculate(std::slice::from_ref(&new_item));
     let new_bill = db
-        .save_bill("T4", &[new_item.clone()], &new_summary, PaymentMethod::Upi)
+        .save_bill(
+            "T4",
+            std::slice::from_ref(&new_item),
+            &new_summary,
+            PaymentMethod::Upi,
+        )
         .expect("save_bill should succeed");
 
     assert_eq!(
