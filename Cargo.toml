@@ -25,7 +25,7 @@ exclude = [
 [dependencies]
 ratatui = "0.30"
 crossterm = "0.29"
-redb = "4"
+redb = "5"
 redb-legacy = { package = "redb", version = "2" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
