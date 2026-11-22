@@ -9,6 +9,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-11-22 - Weekly Patch Release
+
+### 🚀 Features
+- ae70193 feat(db): implement automated redb 2.x to 4.x migration (closes #55)
+
+### 🐛 Bug Fixes
+- 2a9fc8e fix(tui): adapt terminal draw error handling for ratatui 0.30
+
+### 📱 Mobile (Android / iOS)
+- 2aeab31 fix(android): pin kotlinx-coroutines-android to 1.9.0 for Kotlin 2.0 metadata compatibility
+- 6a6aa37 feat(android): upgrade to Kotlin 2.0.21 and adopt official Compose compiler Gradle plugin
+- f6a4ad9 fix(android): pin androidx.core:core-ktx to 1.13.1 for compileSdk 34 compatibility
+- c63df6b ci(android): upgrade to Java 21, Gradle 8.13, Compose 1.5.15, and actions/setup-java@v6
+
+### ⚙️ CI / Automation
+- 8bd1d2c ci(actions): bump dependabot/fetch-metadata from 2 to 3
+- 15e9f84 ci: configure Dependabot ignore rules, PR labels, and RustSec audit
+- 06151ec chore(deps): bump toml from 0.8.23 to 1.2.1+spec-1.1.0
+- de78159 chore(deps): bump crossterm from 0.28.1 to 0.29.0
+- 83469b8 chore(deps): bump ratatui from 0.29.0 to 0.30.2
+- 165256f ci: enhance Dependabot with SemVer grouping, auto-merge, and schedule tuning
+- df93363 ci(actions): bump the actions group with 9 updates
+- 50def30 ci: configure Dependabot for automated dependency updates
+
+### 🔍 Other Changes
+- 15e9f84 ci: configure Dependabot ignore rules, PR labels, and RustSec audit
+- 165256f ci: enhance Dependabot with SemVer grouping, auto-merge, and schedule tuning
+- 50def30 ci: configure Dependabot for automated dependency updates
+
+
+
 ## [0.1.2] - 2026-11-15 - Weekly Patch Release
 
 ### 🚀 Features

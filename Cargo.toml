@@ -1,6 +1,6 @@
 [package]
 name = "dhabatui"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 authors = ["Dhaba POS Team"]
 description = "Fast, keyboard-first Terminal POS and billing application for dhabas and casual eateries"
