@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-11-26 - Weekly Patch Release
+
+### 🐛 Bug Fixes
+- 67c39f5 fix(web): recover from poisoned RwLock on /api/status
+- e28e530 fix(ci): grant checks: write for rustsec audit-check (#80)
+
+### ⚙️ CI / Automation
+- 521d396 chore(deps): upgrade redb from 4 to 5 (#78)
+
+### 📝 Documentation
+- 99b2155 docs(site): align version badge to v0.1.3
+
+
+
 ## [0.1.3] - 2026-11-22 - Weekly Patch Release
 
 ### 🚀 Features
