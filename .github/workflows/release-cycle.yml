@@ -86,7 +86,7 @@ jobs:
             ARGS+=(--version "$CUSTOM_VER")
           fi
 
-          ./scripts/prepare-release.sh "${ARGS[@]}"
+          cargo run --bin xtask -- prepare-release "${ARGS[@]}"
 
           # Extract prepared tag
           NEW_TAG="v$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')"
