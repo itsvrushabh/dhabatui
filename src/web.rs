@@ -177,8 +177,6 @@ pub fn start_lan_server(
     let shared_clone = Arc::clone(&shared_data);
 
     thread::spawn(move || {
-        let html_content = include_str!("dashboard.html");
-
         for request in server.incoming_requests() {
             let remote_addr = request.remote_addr().map(|s| s.ip());
             let is_allowed = remote_addr.as_ref().map(is_lan_ip).unwrap_or(false);
@@ -195,9 +193,13 @@ pub fn start_lan_server(
 
             let url = request.url().to_string();
             if url == "/" || url == "/index.html" {
-                let mut resp = Response::from_string(html_content);
+                let json = {
+                    let guard = shared_clone.read().unwrap();
+                    serde_json::to_string_pretty(&*guard).unwrap_or_else(|_| "{}".to_string())
+                };
+                let mut resp = Response::from_string(json);
                 if let Ok(header) =
-                    Header::from_bytes(&b"Content-Type"[..], &b"text/html; charset=utf-8"[..])
+                    Header::from_bytes(&b"Content-Type"[..], &b"application/json; charset=utf-8"[..])
                 {
                     resp.add_header(header);
                 }
