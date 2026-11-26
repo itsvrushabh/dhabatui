@@ -204,7 +204,7 @@ pub fn start_lan_server(
                 let _ = request.respond(resp);
             } else if url == "/api/status" {
                 let json = {
-                    let guard = shared_clone.read().unwrap();
+                    let guard = shared_clone.read().unwrap_or_else(|e| e.into_inner());
                     serde_json::to_string(&*guard).unwrap_or_else(|_| "{}".to_string())
                 };
 
