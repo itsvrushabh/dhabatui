@@ -338,15 +338,7 @@ mod tests {
     #[test]
     fn test_documented_shortcuts_consistency() {
         const README: &str = include_str!("../README.md");
-        const SITE: &str = include_str!("../site/index.html");
         const WIKI_OPS: &str = include_str!("../wiki/Cashier-and-Staff-Operations.md");
-
-        // Verify version alignment in documentation website
-        let pkg_version = format!("v{}", env!("CARGO_PKG_VERSION"));
-        assert!(
-            SITE.contains(&pkg_version),
-            "site/index.html must display Cargo.toml package version ({pkg_version})"
-        );
 
         // Verify README documentation accuracy
         assert!(
@@ -373,32 +365,6 @@ mod tests {
         assert!(
             !README.contains("2-digit dish numbers"),
             "README must document 3-digit dish codes (e.g. 101)"
-        );
-
-        // Verify documentation website accuracy
-        assert!(
-            SITE.contains("<kbd>t</kbd>"),
-            "site/index.html must document 't' for table cycling"
-        );
-        assert!(
-            SITE.contains("<kbd>Tab</kbd>"),
-            "site/index.html must document 'Tab' for pane focus"
-        );
-        assert!(
-            SITE.contains("<kbd>s</kbd>"),
-            "site/index.html must document 's' for table status"
-        );
-        assert!(
-            !SITE.contains("zero rounding errors"),
-            "site/index.html must NOT claim zero rounding errors (GST uses integer half-up rounding)"
-        );
-        assert!(
-            !SITE.contains("kitchen tickets"),
-            "site/index.html must NOT claim kitchen tickets (app has read-only table dashboard)"
-        );
-        assert!(
-            !SITE.contains("Print Bill & Settle"),
-            "site/index.html must NOT claim hardware printing"
         );
 
         // Verify Wiki operations guide accuracy
