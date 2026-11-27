@@ -123,13 +123,13 @@ jobs:
         run: |
           cd mobile/android
           gradle assembleDebug
-          cp app/build/outputs/apk/debug/*.apk ../../dhabatui-android.apk
+          cp app/build/outputs/apk/debug/*.apk ../../dhabatui-android-debug.apk
 
       - name: Upload Android APK artifact
         uses: actions/upload-artifact@v7
         with:
           name: dhabatui-android-apk
-          path: dhabatui-android.apk
+          path: dhabatui-android-debug.apk
           if-no-files-found: error
           retention-days: 2
 
@@ -183,7 +183,7 @@ jobs:
           files: |
             dist/dhabatui-*.tar.gz
             dist/dhabatui-*.zip
-            dist/dhabatui-android.apk
+            dist/dhabatui-android-debug.apk
             dist/SHA256SUMS.txt
           draft: false
           prerelease: false
