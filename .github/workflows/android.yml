@@ -40,6 +40,11 @@ jobs:
         with:
           gradle-version: '9.9.2'
 
+      - name: Run Android Unit Tests
+        run: |
+          cd mobile/android
+          gradle testDebugUnitTest --no-daemon
+
       - name: Build Android Debug APK
         run: |
           cd mobile/android
